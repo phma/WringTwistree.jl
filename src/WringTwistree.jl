@@ -1,9 +1,18 @@
 module WringTwistree
-export mix3,mix3Parts!
+export fiboPair,mix3Parts!
 
 function mix3(a::Integer,b::Integer,c::Integer)
   mask=(a|b|c)-(a&b&c)
   (a⊻mask,b⊻mask,c⊻mask)
+end
+
+function fiboPair(n::Integer)
+  f0=0
+  f1=1
+  while f0<=n
+    (f0,f1)=(f1,f1+f0)
+  end
+  (f0,f1)
 end
 
 function mix3Parts!(buf::Vector{UInt8},rprime::Integer)
