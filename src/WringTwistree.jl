@@ -15,7 +15,7 @@ function fiboPair(n::Integer)
   (f0,f1)
 end
 
-function mix3Parts!(buf::Vector{UInt8},rprime::Integer)
+function mix3Parts!(buf::Vector{<:Integer},rprime::Integer)
   len=div(length(buf),3)
   a=1
   b=2*len
