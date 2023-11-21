@@ -1,5 +1,5 @@
 module Mix3
-export fiboPair,mix3Parts!
+export searchDir,mix3Parts!
 
 function mix3(a::Integer,b::Integer,c::Integer)
   mask=(a|b|c)-(a&b&c)
@@ -13,6 +13,16 @@ function fiboPair(n::Integer)
     (f0,f1)=(f1,f1+f0)
   end
   (f0,f1)
+end
+
+function searchDir(n::Integer)
+  (num,den)=fiboPair(n)
+  (q,r)=divrem(n*num,den)
+  if r*2<den
+    (q,1)
+  else
+    (q+1,-1)
+  end
 end
 
 function mix3Parts!(buf::Vector{<:Integer},rprime::Integer)
