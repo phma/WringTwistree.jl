@@ -4,4 +4,5 @@ authors = ["Pierre Abbat <phma@bezitopo.org>"]
 version = "0.1.0"
 
 [deps]
+Primes = "27ebfcd6-29c5-5fa9-bf4b-fb8fc14df3ae"
 Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
