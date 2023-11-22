@@ -1,6 +1,6 @@
 module Mix3
-using Primes
-export carmichael,mix3Parts!
+using Primes,Mods
+export carmichael,isMaxOrder,mix3Parts!
 
 function mix3(a::Integer,b::Integer,c::Integer)
   mask=(a|b|c)-(a&b&c)
@@ -36,6 +36,20 @@ function carmichael(n::Integer)
       carfac=p^(ex-1)*(p-1)
     end
     ret=lcm(ret,carfac)
+  end
+  ret
+end
+
+function isMaxOrder(modl::Integer,car::Integer,
+		    fac::Primes.Factorization{<:Integer},n::Integer)
+# modl is the modulus, car is its Carmichael function,
+# fac is the factorization of car,
+# and n is the number being tested.
+# Returns true if n has maximum order, which implies it's a primitive root
+# if modulus has any primitive roots.
+  ret=Mod{modl}(n)^car==1
+  for (p,ex) in fac
+    ret=ret&&Mod{modl}(n)^(car÷p)!=1
   end
   ret
 end
