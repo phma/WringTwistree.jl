@@ -1,5 +1,6 @@
 module Mix3
-export searchDir,mix3Parts!
+using Primes
+export carmichael,mix3Parts!
 
 function mix3(a::Integer,b::Integer,c::Integer)
   mask=(a|b|c)-(a&b&c)
@@ -23,6 +24,20 @@ function searchDir(n::Integer)
   else
     (q+1,-1)
   end
+end
+
+function carmichael(n::Integer)
+  facs=factor(n)
+  ret=one(n)
+  for (p,ex) in facs
+    if p==2 && ex>=3
+      carfac=p^(ex-2)
+    else
+      carfac=p^(ex-1)*(p-1)
+    end
+    ret=lcm(ret,carfac)
+  end
+  ret
 end
 
 function mix3Parts!(buf::Vector{<:Integer},rprime::Integer)

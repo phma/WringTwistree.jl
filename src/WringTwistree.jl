@@ -1,6 +1,6 @@
 module WringTwistree
 include("Mix3.jl")
 using .Mix3
-export searchDir
+export carmichael
 
 end # module WringTwistree
