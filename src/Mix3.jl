@@ -1,6 +1,6 @@
 module Mix3
 using Primes,Mods
-export carmichael,isMaxOrder,mix3Parts!
+export carmichael,findMaxOrder,mix3Parts!
 
 function mix3(a::Integer,b::Integer,c::Integer)
   mask=(a|b|c)-(a&b&c)
@@ -52,6 +52,23 @@ function isMaxOrder(modl::Integer,car::Integer,
     ret=ret&&Mod{modl}(n)^(car÷p)!=1
   end
   ret
+end
+
+function findMaxOrder(n::Integer)
+  car=carmichael(n)
+  fac=factor(car)
+  (start,dir)=searchDir(n)
+  for i in 0:n
+    if (i&1)==1
+      m=start+i÷2+1
+    else
+      m=start-i÷2
+    end
+    if n==1 || isMaxOrder(n,car,fac,m)
+      return m
+    end
+  end
+  one(n)
 end
 
 function mix3Parts!(buf::Vector{<:Integer},rprime::Integer)
