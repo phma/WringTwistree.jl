@@ -1,6 +1,7 @@
 module WringTwistree
 include("Mix3.jl")
-using .Mix3
-export carmichael,findMaxOrder
+include("RotBitcount.jl")
+using .Mix3,.RotBitcount
+export carmichael,rotBitcount!
 
 end # module WringTwistree
