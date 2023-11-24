@@ -11,12 +11,8 @@ export rotBitcount!
 
 function rotBitcount!(src::Vector{UInt8},dst::Vector{UInt8},mult::Integer)
   len=length(src)
-  if len!=length(dst)
-    error("rotBitcount: size mismatch")
-  end
-  if src===dst
-    error("rotBitcount: src and dst must be different")
-  end
+  @assert len==length(dst) "rotBitcount: size mismatch"
+  @assert src!==dst "rotBitcount: src and dst must be different"
   multmod=mod(mult,len*8)
   bitcount=mapreduce(count_ones,+,src)
   rotcount=(bitcount*multmod)%(len*8)
