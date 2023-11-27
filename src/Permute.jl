@@ -1,6 +1,6 @@
 module Permute
 using OffsetArrays
-export permut8!,permut8x32!
+export permut8!,permut8x32!,dealInx
 
 function permut8!(ys::OffsetArray{<:Any},off::Integer,n::Integer)
 # off should be a multiple of 8.
@@ -31,5 +31,9 @@ function permut8x32!(sbox::OffsetArray{<:Any},key::OffsetArray{<:Integer})
 end
 
 const shift3=OffsetArray([0x00,0x1d,0x3a,0x27,0x74,0x69,0x4e,0x53],0:7)
+
+function dealInx(n::Integer)
+  ((n<<3)&0xf8)⊻(shift3[(n>>5)&7])
+end
 
 end
