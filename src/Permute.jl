@@ -1,8 +1,9 @@
 module Permute
+using OffsetArrays
 export permut8!,permut8x32!
 
-function permut8!(ys::Vector{<:Any},off::Integer,n::Integer)
-# off should be 1 more than a multiple of 8.
+function permut8!(ys::OffsetArray{<:Any},off::Integer,n::Integer)
+# off should be a multiple of 8.
 # Permutes the eight elements starting at off according to n.
   swapOrder=[0,0,0,0,0,0,0]
   swapOrder[1]=n&1
@@ -22,11 +23,13 @@ function permut8!(ys::Vector{<:Any},off::Integer,n::Integer)
   end
 end
 
-function permut8x32!(sbox::Vector{<:Any},key::Vector{<:Integer})
+function permut8x32!(sbox::OffsetArray{<:Any},key::OffsetArray{<:Integer})
   @assert length(sbox)==8*length(key)
   for i in 0:length(key)-1
-    permut8!(sbox,8*i+1,key[i+1])
+    permut8!(sbox,8*i,key[i])
   end
 end
+
+const shift3=OffsetArray([0x00,0x1d,0x3a,0x27,0x74,0x69,0x4e,0x53],0:7)
 
 end
