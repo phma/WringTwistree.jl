@@ -1,6 +1,6 @@
 module KeySchedule
 using OffsetArrays
-export mul65537,extendKey,keySchedule
+export mul65537,extendKey,keySchedule,reschedule!
 
 function extendKey(str::Vector{UInt8})
   ret=OffsetArray(UInt16[],0:-1)
@@ -41,6 +41,12 @@ function keySchedule(key::Vector{UInt8})
     alter!(subkey,xkey[i],i%96)
   end
   subkey
+end
+
+function reschedule!(subkey::OffsetArray{UInt16})
+  for i in 0:95
+    alter!(subkey,40504,i)
+  end
 end
 
 end
