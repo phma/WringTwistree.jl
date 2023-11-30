@@ -16,6 +16,10 @@ function sboxes(key::Vector{UInt8})
   sbox
 end
 
+function sboxes(key::String)
+  sboxes(Vector{UInt8}(key))
+end
+
 function inverse(sbox::OffsetArray{UInt8})
   inv=copy(sbox)
   for i=0:2
