@@ -4,10 +4,11 @@ include("RotBitcount.jl")
 include("Sboxes.jl")
 using OffsetArrays,Base.Threads
 using .Mix3,.RotBitcount,.Sboxes
-export carmichael,sboxes,inverse
+export carmichael,findMaxOrder
 export keyedWring,encrypt!,decrypt!
 # carmichael is exported in case someone wants the Carmichael function,
 # which I couldn't find.
+# findMaxOrder is needed for test.
 
 function nRounds(len::Integer)
   ret=3
