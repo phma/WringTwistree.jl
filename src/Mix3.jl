@@ -77,7 +77,7 @@ function mix3Parts!(buf::Vector{<:Integer},rprime::Integer)
   b=2*len
   c=2*len+1
   while len>0 && a<b
-    (buf[a],buf[b],buf[c])=mix3(buf[a],buf[b],buf[c])
+    @inbounds (buf[a],buf[b],buf[c])=mix3(buf[a],buf[b],buf[c])
     a+=1
     b-=1
     c+=rprime

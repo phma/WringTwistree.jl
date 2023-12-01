@@ -19,7 +19,6 @@ function nRounds(len::Integer)
 end
 
 function xorn(n::Integer)
-  @assert n>=0
   ret=0x00
   while n>0
     ret⊻=UInt8(n&0xff)
@@ -43,22 +42,22 @@ function roundEncrypt(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
 		      rprime::Integer,rond::Integer)
   mix3Parts!(src,rprime) # this clobbers src
   for i in eachindex(src)
-    src[i]=wring.sbox[src[i],(rond+i-1)%3]
+    @inbounds src[i]=wring.sbox[src[i],(rond+i-1)%3]
   end
   rotBitcount!(src,dst,1)
   for i in eachindex(dst)
-    dst[i]+=xorn((i-1)⊻rond)
+    @inbounds dst[i]+=xorn((i-1)⊻rond)
   end
 end
 
 function roundDecrypt(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
 		      rprime::Integer,rond::Integer)
   for i in eachindex(src)
-    src[i]-=xorn((i-1)⊻rond) # this clobbers src
+    @inbounds src[i]-=xorn((i-1)⊻rond) # this clobbers src
   end
   rotBitcount!(src,dst,-1)
   for i in eachindex(dst)
-    dst[i]=wring.invSbox[dst[i],(rond+i-1)%3]
+    @inbounds dst[i]=wring.invSbox[dst[i],(rond+i-1)%3]
   end
   mix3Parts!(dst,rprime)
 end
@@ -77,7 +76,7 @@ function encrypt!(wring::Wring,buf::Vector{UInt8})
   end
   if (nrond&1)>0
     for i in eachindex(tmp)
-      buf[i]=tmp[i]
+      @inbounds buf[i]=tmp[i]
     end
   end
 end
@@ -96,7 +95,7 @@ function decrypt!(wring::Wring,buf::Vector{UInt8})
   end
   if (nrond&1)>0
     for i in eachindex(tmp)
-      buf[i]=tmp[i]
+      @inbounds buf[i]=tmp[i]
     end
   end
 end
