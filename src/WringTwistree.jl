@@ -5,7 +5,7 @@ include("Sboxes.jl")
 using OffsetArrays
 using .Mix3,.RotBitcount,.Sboxes
 export carmichael,sboxes,inverse
-export keyedWring,nRounds,xorn
+export keyedWring,encrypt!
 # carmichael is exported in case someone wants the Carmichael function,
 # which I couldn't find.
 
@@ -18,7 +18,8 @@ function nRounds(len::Integer)
   ret
 end
 
-function xorn(n::Unsigned)
+function xorn(n::Integer)
+  @assert n>=0
   ret=0x00
   while n>0
     ret⊻=UInt8(n&0xff)
@@ -40,13 +41,32 @@ end
 
 function roundEncrypt(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
 		      rprime::Integer,rond::Integer)
-  mix3parts!(src,rprime) # this clobbers src
+  mix3Parts!(src,rprime) # this clobbers src
   for i in eachindex(src)
-    src[i]=wring.sbox[src[i],(rond+i)%3]
+    src[i]=wring.sbox[src[i],(rond+i-1)%3]
   end
-  rotBitcount(src,dst,1)
+  rotBitcount!(src,dst,1)
   for i in eachindex(dst)
-    dst[i]+=xorn(i⊻rond)
+    dst[i]+=xorn((i-1)⊻rond)
+  end
+end
+
+function encrypt!(wring::Wring,buf::Vector{UInt8})
+# Puts ciphertext back into buf.
+  tmp=copy(buf)
+  nrond=nRounds(length(buf))
+  rprime=length(buf)<3 ? 1 : findMaxOrder(length(buf)÷3)
+  for i in 0:nrond-1
+    if (i&1)==0
+      roundEncrypt(wring,buf,tmp,rprime,i)
+    else
+      roundEncrypt(wring,tmp,buf,rprime,i)
+    end
+  end
+  if (nrond&1)>0
+    for i in eachindex(tmp)
+      buf[i]=tmp[i]
+    end
   end
 end
 

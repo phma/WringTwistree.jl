@@ -4,6 +4,7 @@ authors = ["Pierre Abbat <phma@bezitopo.org>"]
 version = "0.1.0"
 
 [deps]
+Debugger = "31a5f54b-26ea-5ae9-a837-f05ce5417438"
 Mods = "7475f97c-0381-53b1-977b-4c60186c8d62"
 OffsetArrays = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
 Primes = "27ebfcd6-29c5-5fa9-bf4b-fb8fc14df3ae"
