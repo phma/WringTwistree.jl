@@ -1,5 +1,5 @@
 module Mix3
-using Primes,Mods
+using Primes,Mods,Base.Threads
 export carmichael,findMaxOrder,mix3Parts!
 
 function mix3(a::Integer,b::Integer,c::Integer)

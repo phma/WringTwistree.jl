@@ -1,4 +1,5 @@
 module RotBitcount
+using Base.Threads
 export rotBitcount!
 
 # This module is used in both Wring and Twistree.
@@ -18,8 +19,9 @@ function rotBitcount!(src::Vector{UInt8},dst::Vector{UInt8},mult::Integer)
   rotcount=(bitcount*multmod)%(len*8)
   byte=rotcount>>3
   bit=rotcount&7
-  for i in 1:len
-    @inbounds dst[i]=(src[(i+len-byte-1)%len+1]<<bit) | (src[(i+len-byte-2)%len+1]>>(8-bit))
+  @threads for i in 1:len
+    @inbounds dst[i]=(src[(i+len-byte-1)%len+1]<<bit) |
+		     (src[(i+len-byte-2)%len+1]>>(8-bit))
   end
 end
 

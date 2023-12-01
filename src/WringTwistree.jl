@@ -2,7 +2,7 @@ module WringTwistree
 include("Mix3.jl")
 include("RotBitcount.jl")
 include("Sboxes.jl")
-using OffsetArrays
+using OffsetArrays,Base.Threads
 using .Mix3,.RotBitcount,.Sboxes
 export carmichael,sboxes,inverse
 export keyedWring,encrypt!,decrypt!
@@ -41,22 +41,22 @@ end
 function roundEncrypt(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
 		      rprime::Integer,rond::Integer)
   mix3Parts!(src,rprime) # this clobbers src
-  for i in eachindex(src)
+  @threads for i in eachindex(src)
     @inbounds src[i]=wring.sbox[src[i],(rond+i-1)%3]
   end
   rotBitcount!(src,dst,1)
-  for i in eachindex(dst)
+  @threads for i in eachindex(dst)
     @inbounds dst[i]+=xorn((i-1)⊻rond)
   end
 end
 
 function roundDecrypt(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
 		      rprime::Integer,rond::Integer)
-  for i in eachindex(src)
+  @threads for i in eachindex(src)
     @inbounds src[i]-=xorn((i-1)⊻rond) # this clobbers src
   end
   rotBitcount!(src,dst,-1)
-  for i in eachindex(dst)
+  @threads for i in eachindex(dst)
     @inbounds dst[i]=wring.invSbox[dst[i],(rond+i-1)%3]
   end
   mix3Parts!(dst,rprime)
