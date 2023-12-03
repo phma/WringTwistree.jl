@@ -43,7 +43,7 @@ end
 
 function roundEncryptSeq(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
 		      rprime::Integer,rond::Integer)
-  mix3Parts!(src,rprime) # this clobbers src
+  mix3PartsSeq!(src,rprime) # this clobbers src
   @threads for i in eachindex(src)
     @inbounds src[i]=wring.sbox[src[i],(rond+i-1)%3]
   end
@@ -62,12 +62,12 @@ function roundDecryptSeq(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
   for i in eachindex(dst)
     @inbounds dst[i]=wring.invSbox[dst[i],(rond+i-1)%3]
   end
-  mix3Parts!(dst,rprime)
+  mix3PartsSeq!(dst,rprime)
 end
 
 function roundEncryptPar(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
 		      rprime::Integer,rond::Integer)
-  mix3Parts!(src,rprime) # this clobbers src
+  mix3PartsPar!(src,rprime) # this clobbers src
   @threads for i in eachindex(src)
     @inbounds src[i]=wring.sbox[src[i],(rond+i-1)%3]
   end
@@ -86,7 +86,7 @@ function roundDecryptPar(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
   @threads for i in eachindex(dst)
     @inbounds dst[i]=wring.invSbox[dst[i],(rond+i-1)%3]
   end
-  mix3Parts!(dst,rprime)
+  mix3PartsPar!(dst,rprime)
 end
 
 function encryptSeq!(wring::Wring,buf::Vector{UInt8})
