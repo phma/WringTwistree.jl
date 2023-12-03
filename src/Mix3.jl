@@ -2,6 +2,8 @@ module Mix3
 using Primes,Mods,Base.Threads
 export carmichael,findMaxOrder,mix3PartsSeq!,mix3PartsPar!
 
+const yieldInterval=101
+
 function mix3(a::Integer,b::Integer,c::Integer)
   mask=(a|b|c)-(a&b&c)
   (a⊻mask,b⊻mask,c⊻mask)
@@ -71,20 +73,27 @@ function findMaxOrder(n::Integer)
   one(n)
 end
 
+function mix3Worker!(buf::Vector{<:Integer},a,b,c,aInc,cInc,len)
+  while len>0 && a<b
+    @inbounds (buf[a],buf[b],buf[c])=mix3(buf[a],buf[b],buf[c])
+    a+=aInc
+    b-=aInc
+    c+=cInc
+    if c>3*len
+      c-=len
+    end
+    if a%yieldInterval==0
+      yield()
+    end
+  end
+end
+
 function mix3PartsSeq!(buf::Vector{<:Integer},rprime::Integer)
   len=div(length(buf),3)
   a=1
   b=2*len
   c=2*len+1
-  while len>0 && a<b
-    @inbounds (buf[a],buf[b],buf[c])=mix3(buf[a],buf[b],buf[c])
-    a+=1
-    b-=1
-    c+=rprime
-    if c>3*len
-      c-=len
-    end
-  end
+  mix3Worker!(buf,a,b,c,1,rprime,len)
 end
 
 function mix3PartsPar!(buf::Vector{<:Integer},rprime::Integer)
