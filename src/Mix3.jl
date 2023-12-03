@@ -5,7 +5,7 @@ export carmichael,findMaxOrder,mix3PartsSeq!,mix3PartsPar!
 # This should be a prime greater than all prime factors of numbers of threads
 # on CPUs. For instance, since there are 22-core 88-thread Power9 chips, it
 # should be greater than 11.
-const yieldInterval=101
+const yieldInterval=8191
 
 function mix3(a::Integer,b::Integer,c::Integer)
   mask=(a|b|c)-(a&b&c)
