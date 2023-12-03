@@ -28,6 +28,15 @@ function testVectorWring(wring,plaintext,ciphertext)
   ret
 end
 
+function testParallelWring(wring,plaintext)
+  plaintext=Vector{UInt8}(plaintext)
+  text=copy(plaintext)
+  encryptSeq!(wring,text)
+  decryptPar!(wring,text)
+  ret=text==plaintext
+  ret
+end
+
 #Test vectors for Wring
 @test testVectorWring(wring0,[0,0,0,0,0,0,0,0],
 		      [0x77,0x3e,0x34,0x8f,0x48,0xa1,0x24,0x1a])
@@ -77,3 +86,6 @@ end
 		      [0xd3,0xa8,0x3f,0xb6,0x9a,0x5e,0x0f,0x07,0x11])
 @test testVectorWring(wring96,"AllOrNone",
 		      [0x53,0x6c,0x7e,0x2d,0xcd,0xda,0xdc,0xf2,0x70])
+
+# Test parallel Wring
+@test testParallelWring(wring96,key96)
