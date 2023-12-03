@@ -5,10 +5,12 @@ include("Sboxes.jl")
 using OffsetArrays,Base.Threads
 using .Mix3,.RotBitcount,.Sboxes
 export carmichael,findMaxOrder
-export keyedWring,encrypt!,decrypt!
+export keyedWring,encryptSeq!,decryptSeq!,encryptPar!,decryptPar!,encrypt!,decrypt!
 # carmichael is exported in case someone wants the Carmichael function,
 # which I couldn't find.
 # findMaxOrder is needed for test.
+
+const parBig::Int=1000
 
 function nRounds(len::Integer)
   ret=3
@@ -39,40 +41,64 @@ function keyedWring(key) # key is a String or Vector{UInt8}
   Wring(sbox,invSbox)
 end
 
-function roundEncrypt(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
+function roundEncryptSeq(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
 		      rprime::Integer,rond::Integer)
   mix3Parts!(src,rprime) # this clobbers src
   @threads for i in eachindex(src)
     @inbounds src[i]=wring.sbox[src[i],(rond+i-1)%3]
   end
-  rotBitcount!(src,dst,1)
+  rotBitcountSeq!(src,dst,1)
+  for i in eachindex(dst)
+    @inbounds dst[i]+=xorn((i-1)⊻rond)
+  end
+end
+
+function roundDecryptSeq(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
+		      rprime::Integer,rond::Integer)
+  @threads for i in eachindex(src)
+    @inbounds src[i]-=xorn((i-1)⊻rond) # this clobbers src
+  end
+  rotBitcountSeq!(src,dst,-1)
+  for i in eachindex(dst)
+    @inbounds dst[i]=wring.invSbox[dst[i],(rond+i-1)%3]
+  end
+  mix3Parts!(dst,rprime)
+end
+
+function roundEncryptPar(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
+		      rprime::Integer,rond::Integer)
+  mix3Parts!(src,rprime) # this clobbers src
+  @threads for i in eachindex(src)
+    @inbounds src[i]=wring.sbox[src[i],(rond+i-1)%3]
+  end
+  rotBitcountPar!(src,dst,1)
   @threads for i in eachindex(dst)
     @inbounds dst[i]+=xorn((i-1)⊻rond)
   end
 end
 
-function roundDecrypt(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
+function roundDecryptPar(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
 		      rprime::Integer,rond::Integer)
   @threads for i in eachindex(src)
     @inbounds src[i]-=xorn((i-1)⊻rond) # this clobbers src
   end
-  rotBitcount!(src,dst,-1)
+  rotBitcountPar!(src,dst,-1)
   @threads for i in eachindex(dst)
     @inbounds dst[i]=wring.invSbox[dst[i],(rond+i-1)%3]
   end
   mix3Parts!(dst,rprime)
 end
 
-function encrypt!(wring::Wring,buf::Vector{UInt8})
+function encryptSeq!(wring::Wring,buf::Vector{UInt8})
 # Puts ciphertext back into buf.
   tmp=copy(buf)
   nrond=nRounds(length(buf))
   rprime=length(buf)<3 ? 1 : findMaxOrder(length(buf)÷3)
   for i in 0:nrond-1
     if (i&1)==0
-      roundEncrypt(wring,buf,tmp,rprime,i)
+      roundEncryptSeq(wring,buf,tmp,rprime,i)
     else
-      roundEncrypt(wring,tmp,buf,rprime,i)
+      roundEncryptSeq(wring,tmp,buf,rprime,i)
     end
   end
   if (nrond&1)>0
@@ -82,22 +108,76 @@ function encrypt!(wring::Wring,buf::Vector{UInt8})
   end
 end
 
-function decrypt!(wring::Wring,buf::Vector{UInt8})
+function decryptSeq!(wring::Wring,buf::Vector{UInt8})
 # Puts plaintext back into buf.
   tmp=copy(buf)
   nrond=nRounds(length(buf))
   rprime=length(buf)<3 ? 1 : findMaxOrder(length(buf)÷3)
   for i in reverse(0:nrond-1)
     if ((nrond-i)&1)==1
-      roundDecrypt(wring,buf,tmp,rprime,i)
+      roundDecryptSeq(wring,buf,tmp,rprime,i)
     else
-      roundDecrypt(wring,tmp,buf,rprime,i)
+      roundDecryptSeq(wring,tmp,buf,rprime,i)
     end
   end
   if (nrond&1)>0
     for i in eachindex(tmp)
       @inbounds buf[i]=tmp[i]
     end
+  end
+end
+
+function encryptPar!(wring::Wring,buf::Vector{UInt8})
+# Puts ciphertext back into buf.
+  tmp=copy(buf)
+  nrond=nRounds(length(buf))
+  rprime=length(buf)<3 ? 1 : findMaxOrder(length(buf)÷3)
+  for i in 0:nrond-1
+    if (i&1)==0
+      roundEncryptPar(wring,buf,tmp,rprime,i)
+    else
+      roundEncryptPar(wring,tmp,buf,rprime,i)
+    end
+  end
+  if (nrond&1)>0
+    @threads for i in eachindex(tmp)
+      @inbounds buf[i]=tmp[i]
+    end
+  end
+end
+
+function decryptPar!(wring::Wring,buf::Vector{UInt8})
+# Puts plaintext back into buf.
+  tmp=copy(buf)
+  nrond=nRounds(length(buf))
+  rprime=length(buf)<3 ? 1 : findMaxOrder(length(buf)÷3)
+  for i in reverse(0:nrond-1)
+    if ((nrond-i)&1)==1
+      roundDecryptPar(wring,buf,tmp,rprime,i)
+    else
+      roundDecryptPar(wring,tmp,buf,rprime,i)
+    end
+  end
+  if (nrond&1)>0
+    @threads for i in eachindex(tmp)
+      @inbounds buf[i]=tmp[i]
+    end
+  end
+end
+
+function encrypt!(wring::Wring,buf::Vector{UInt8})
+  if length(buf)>parBig
+    encryptPar!(wring,buf)
+  else
+    encryptSeq!(wring,buf)
+  end
+end
+
+function decrypt!(wring::Wring,buf::Vector{UInt8})
+  if length(buf)>parBig
+    decryptPar!(wring,buf)
+  else
+    decryptSeq!(wring,buf)
   end
 end
 
