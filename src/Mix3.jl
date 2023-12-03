@@ -2,6 +2,9 @@ module Mix3
 using Primes,Mods,Base.Threads
 export carmichael,findMaxOrder,mix3PartsSeq!,mix3PartsPar!
 
+# This should be a prime greater than all prime factors of numbers of threads
+# on CPUs. For instance, since there are 22-core 88-thread Power9 chips, it
+# should be greater than 11.
 const yieldInterval=101
 
 function mix3(a::Integer,b::Integer,c::Integer)
@@ -101,14 +104,21 @@ function mix3PartsPar!(buf::Vector{<:Integer},rprime::Integer)
   a=1
   b=2*len
   c=2*len+1
-  while len>0 && a<b
-    @inbounds (buf[a],buf[b],buf[c])=mix3(buf[a],buf[b],buf[c])
+  aInc=nthreads()
+  cInc=(rprime*aInc)%len
+  tasks=Task[]
+  for i in 1:aInc
+    #println("Starting task a=",a," b=",b," c=",c," aInc=",aInc," cInc=",cInc)
+    push!(tasks,@spawn mix3Worker!(buf,$a,$b,$c,aInc,cInc,len))
     a+=1
     b-=1
     c+=rprime
     if c>3*len
       c-=len
     end
+  end
+  for i in 1:aInc
+    wait(tasks[i])
   end
 end
 
