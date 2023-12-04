@@ -65,9 +65,9 @@ function findMaxOrder(n::Integer)
   (start,dir)=searchDir(n)
   for i in 0:n
     if (i&1)==1
-      m=start+i÷2+1
+      m=start+dir*(i÷2+1)
     else
-      m=start-i÷2
+      m=start-dir*(i÷2)
     end
     if n==1 || isMaxOrder(n,car,fac,m)
       return m
