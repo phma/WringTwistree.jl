@@ -2,10 +2,12 @@ module WringTwistree
 include("Mix3.jl")
 include("RotBitcount.jl")
 include("Sboxes.jl")
+include("Compress.jl")
 using OffsetArrays,Base.Threads
-using .Mix3,.RotBitcount,.Sboxes
+using .Mix3,.RotBitcount,.Sboxes,.Compress
 export carmichael,findMaxOrder
 export keyedWring,encryptSeq!,decryptSeq!,encryptPar!,decryptPar!,encrypt!,decrypt!
+export blockSize,twistPrime
 # carmichael is exported in case someone wants the Carmichael function,
 # which I couldn't find.
 # findMaxOrder is needed for test.
