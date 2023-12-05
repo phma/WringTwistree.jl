@@ -19,7 +19,9 @@ lfsr=OffsetArray(map(collect(0:255)) do x
   for i in 1:8
     x=lfsr1(x)
   end
-  x
+  convert(UInt32,x)
 end,0:255)
+
+#function backCrc1(a::Integer,b::Integer)
 
 end
