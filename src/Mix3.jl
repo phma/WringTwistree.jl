@@ -13,8 +13,8 @@ function mix3(a::Integer,b::Integer,c::Integer)
 end
 
 function fiboPair(n::Integer)
-  f0=0
-  f1=1
+  f0=zero(n)
+  f1=one(n)
   while f0<=n
     (f0,f1)=(f1,f1+f0)
   end
@@ -22,8 +22,9 @@ function fiboPair(n::Integer)
 end
 
 function searchDir(n::Integer)
-  (num,den)=fiboPair(n)
+  (num,den)=fiboPair(BigInt(n))
   (q,r)=divrem(n*num,den)
+  q=convert(typeof(n),q)
   if r*2<den
     (q,1)
   else
@@ -70,7 +71,7 @@ function findMaxOrder(n::Integer)
       m=start-dir*(i÷2)
     end
     if n==1 || isMaxOrder(n,car,fac,m)
-      return m
+      return convert(typeof(n),m)
     end
   end
   one(n)
