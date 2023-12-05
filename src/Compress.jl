@@ -4,7 +4,7 @@ include("RotBitcount.jl")
 include("Sboxes.jl")
 using OffsetArrays
 using .Mix3,.RotBitcount,.Sboxes
-export blockSize,twistPrime,relPrimes,lfsr
+export blockSize,twistPrime,relPrimes,lfsr,backCrc!
 
 const blockSize=32
 const twistPrime=37
@@ -22,6 +22,12 @@ lfsr=OffsetArray(map(collect(0:255)) do x
   convert(UInt32,x)
 end,0:255)
 
-#function backCrc1(a::Integer,b::Integer)
+function backCrc!(src::Vector{<:Integer},dst::Vector{<:Integer})
+  acc=0xdeadc0de
+  for i in reverse(eachindex(src))
+    acc=(acc>>8)⊻lfsr[acc&255]⊻src[i]
+    dst[i]=acc&255
+  end
+end
 
 end
