@@ -4,18 +4,19 @@ include("RotBitcount.jl")
 include("Sboxes.jl")
 using OffsetArrays
 using .Mix3,.RotBitcount,.Sboxes
-export blockSize,twistPrime,relPrimes,lfsr,backCrc!
+export relPrimes,lfsr,backCrc!,roundCompress!
 
 const blockSize=32
 const twistPrime=37
 
-relPrimes=OffsetArray(map(findMaxOrder∘(x -> x÷0x3),collect(0x0020:0x0060)),0x20:0x60)
+const relPrimes=OffsetArray(map(findMaxOrder∘(x -> x÷0x3),
+			    collect(0x0020:0x0060)),0x20:0x60)
 
 function lfsr1(n::Integer)
   ((n&1)*0x84802140)⊻(n>>1)
 end
 
-lfsr=OffsetArray(map(collect(0:255)) do x
+const lfsr=OffsetArray(map(collect(0:255)) do x
   for i in 1:8
     x=lfsr1(x)
   end
@@ -28,6 +29,19 @@ function backCrc!(src::Vector{<:Integer},dst::Vector{<:Integer})
     acc=(acc>>8)⊻lfsr[acc&255]⊻src[i]
     dst[i]=acc&255
   end
+end
+
+function roundCompress!(sbox::OffsetArray{UInt8},buf::Vector{UInt8},sboxalt::Integer)
+  tmp=copy(buf)
+  rprime=relPrimes[length(buf)]
+  len=length(buf)÷3
+  mix3PartsSeq!(buf,rprime);
+  for i in eachindex(buf)
+    buf[i]=sbox[buf[i],(sboxalt+i-1)%3]
+  end
+  rotBitcountSeq!(buf,tmp,twistPrime)
+  backCrc!(tmp,buf)
+  resize!(buf,length(buf)-4)
 end
 
 end
