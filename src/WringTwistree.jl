@@ -46,7 +46,7 @@ end
 function roundEncryptSeq(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
 		      rprime::Integer,rond::Integer)
   mix3PartsSeq!(src,rprime) # this clobbers src
-  @threads for i in eachindex(src)
+  for i in eachindex(src)
     @inbounds src[i]=wring.sbox[src[i],(rond+i-1)%3]
   end
   rotBitcountSeq!(src,dst,1)
@@ -57,7 +57,7 @@ end
 
 function roundDecryptSeq(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
 		      rprime::Integer,rond::Integer)
-  @threads for i in eachindex(src)
+  for i in eachindex(src)
     @inbounds src[i]-=xorn((i-1)⊻rond) # this clobbers src
   end
   rotBitcountSeq!(src,dst,-1)
