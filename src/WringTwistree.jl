@@ -7,7 +7,7 @@ using OffsetArrays,Base.Threads
 using .Mix3,.RotBitcount,.Sboxes,.Compress
 export carmichael,findMaxOrder
 export keyedWring,encryptSeq!,decryptSeq!,encryptPar!,decryptPar!,encrypt!,decrypt!
-export sboxes,relPrimes,lfsr,backCrc!,roundCompress!
+export sboxes,relPrimes,lfsr,backCrc!,compress!
 # carmichael is exported in case someone wants the Carmichael function,
 # which I couldn't find.
 # findMaxOrder is needed for test.

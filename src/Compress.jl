@@ -4,7 +4,7 @@ include("RotBitcount.jl")
 include("Sboxes.jl")
 using OffsetArrays
 using .Mix3,.RotBitcount,.Sboxes
-export relPrimes,lfsr,backCrc!,roundCompress!
+export relPrimes,lfsr,backCrc!,compress!
 
 const blockSize=32
 const twistPrime=37
@@ -42,6 +42,12 @@ function roundCompress!(sbox::OffsetArray{UInt8},buf::Vector{UInt8},sboxalt::Int
   rotBitcountSeq!(buf,tmp,twistPrime)
   backCrc!(tmp,buf)
   resize!(buf,length(buf)-4)
+end
+
+function compress!(sbox::OffsetArray{UInt8},buf::Vector{UInt8},sboxalt::Integer)
+  while length(buf)>blockSize
+    roundCompress!(sbox,buf,sboxalt)
+  end
 end
 
 end
