@@ -3,11 +3,12 @@ include("Mix3.jl")
 include("RotBitcount.jl")
 include("Sboxes.jl")
 include("Compress.jl")
+include("Blockize.jl")
 using OffsetArrays,Base.Threads
-using .Mix3,.RotBitcount,.Sboxes,.Compress
+using .Mix3,.RotBitcount,.Sboxes,.Compress,.Blockize
 export carmichael,findMaxOrder
 export keyedWring,encryptSeq!,decryptSeq!,encryptPar!,decryptPar!,encrypt!,decrypt!
-export sboxes,relPrimes,lfsr,backCrc!,compress!
+export sboxes,relPrimes,lfsr,backCrc!,compress!,ℯ⁴_2adic,ℯ⁴_base2
 # carmichael is exported in case someone wants the Carmichael function,
 # which I couldn't find.
 # findMaxOrder is needed for test.
