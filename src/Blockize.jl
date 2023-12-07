@@ -2,7 +2,7 @@ module Blockize
 include("Compress.jl")
 using OffsetArrays
 using .Compress
-export ℯ⁴_2adic,ℯ⁴_base2,blockize!
+export ℯ⁴_2adic,ℯ⁴_base2,blockize!,pad!
 
 # ℯ⁴, in two binary representations, is prepended to the
 # blocks being hashed, so that if the message is only one block,
@@ -38,6 +38,16 @@ function blockize!(bs::Vector{UInt8},part::Vector{UInt8})
     i+=blockSize
   end
   append!(part,bs[i+1:length(bs)])
+  ret
+end
+
+function pad!(part::Vector{UInt8})
+  ret=UInt8[]
+  for i in 1:blockSize-length(part)
+    push!(part,i-1)
+  end
+  ret=copy(part)
+  empty!(part)
   ret
 end
 
