@@ -8,6 +8,7 @@ using OffsetArrays,Base.Threads
 using .Mix3,.RotBitcount,.Sboxes,.Compress,.Blockize
 export carmichael,findMaxOrder
 export keyedWring,encryptSeq!,decryptSeq!,encryptPar!,decryptPar!,encrypt!,decrypt!
+export keyedTwistree
 export sboxes,relPrimes,compress!,ℯ⁴_2adic,ℯ⁴_base2,blockize!,pad!
 # carmichael is exported in case someone wants the Carmichael function,
 # which I couldn't find.
@@ -182,6 +183,21 @@ function decrypt!(wring::Wring,buf::Vector{UInt8})
   else
     decryptSeq!(wring,buf)
   end
+end
+
+mutable struct Twistree
+  sbox		::OffsetArray{UInt8}
+  tree2		::Vector{Vector{UInt8}}
+  tree3		::Vector{Vector{UInt8}}
+  partialBlock	::Vector{UInt8}
+end
+
+function keyedTwistree(key) # key is a String or Vector{UInt8}
+  sbox=sboxes(key)
+  tree2=Vector{UInt8}[]
+  tree3=Vector{UInt8}[]
+  partialBlock=UInt8[]
+  Twistree(sbox,tree2,tree3,partialBlock)
 end
 
 end # module WringTwistree
