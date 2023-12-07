@@ -4,7 +4,7 @@ include("RotBitcount.jl")
 include("Sboxes.jl")
 using OffsetArrays
 using .Mix3,.RotBitcount,.Sboxes
-export relPrimes,lfsr,backCrc!,compress!
+export relPrimes,lfsr,backCrc!,compress!,blockSize,twistPrime
 
 const blockSize=32
 const twistPrime=37

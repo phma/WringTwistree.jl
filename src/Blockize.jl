@@ -2,9 +2,9 @@ module Blockize
 include("Compress.jl")
 using OffsetArrays
 using .Compress
-export ℯ⁴_2adic,ℯ⁴_base2
+export ℯ⁴_2adic,ℯ⁴_base2,blockize!
 
-# e⁴, in two binary representations, is prepended to the
+# ℯ⁴, in two binary representations, is prepended to the
 # blocks being hashed, so that if the message is only one block,
 # two different compressed blocks are combined at the end.
 
@@ -21,5 +21,24 @@ const ℯ⁴_base2=
   , 0xda, 0x72, 0x7b, 0x72, 0xfb, 0x77, 0xda, 0x1a
   , 0xcf, 0xb0, 0x74, 0x4e, 0x5c, 0x20, 0x99, 0x36
   ]
+
+function blockize!(bs::Vector{UInt8},part::Vector{UInt8})
+  ret=Vector{UInt8}[]
+  i=0
+  if length(part)+length(bs)>=blockSize
+    i=blockSize-length(part);
+    append!(part,bs[1:i])
+    push!(ret,copy(part))
+    empty!(part)
+  end
+  while length(bs)-i>=blockSize
+    append!(part,bs[i+1:i+blockSize])
+    push!(ret,copy(part))
+    empty!(part)
+    i+=blockSize
+  end
+  append!(part,bs[i+1:length(bs)])
+  ret
+end
 
 end
