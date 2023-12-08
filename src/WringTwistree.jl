@@ -222,4 +222,30 @@ function initialize!(tw::Twistree)
   push!(tw.tree3,copy(ℯ⁴_base2))
 end
 
+function compressPairs!(tw::Twistree)
+  i=1
+  while length(tw.tree2[i])>blockSize
+    if i==length(tw.tree2)
+      push!(tw.tree2,UInt8[])
+    end
+    compress!(tw.sbox,tw.tree2[i],0)
+    append!(tw.tree2[i+1],tw.tree2[i])
+    empty!(tw.tree2[i])
+    i+=1
+  end
+end
+
+function compressTriples!(tw::Twistree)
+  i=1
+  while length(tw.tree3[i])>2*blockSize
+    if i==length(tw.tree3)
+      push!(tw.tree3,UInt8[])
+    end
+    compress!(tw.sbox,tw.tree3[i],1)
+    append!(tw.tree3[i+1],tw.tree3[i])
+    empty!(tw.tree3[i])
+    i+=1
+  end
+end
+
 end # module WringTwistree
