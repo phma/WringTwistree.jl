@@ -8,7 +8,7 @@ using OffsetArrays,Base.Threads
 using .Mix3,.RotBitcount,.Sboxes,.Compress,.Blockize
 export carmichael,findMaxOrder
 export keyedWring,encryptSeq!,decryptSeq!,encryptPar!,decryptPar!,encrypt!,decrypt!
-export keyedTwistree
+export keyedTwistree,initialize!
 export sboxes,relPrimes,compress!,ℯ⁴_2adic,ℯ⁴_base2,blockize!,pad!
 # carmichael is exported in case someone wants the Carmichael function,
 # which I couldn't find.
@@ -198,6 +198,28 @@ function keyedTwistree(key) # key is a String or Vector{UInt8}
   tree3=Vector{UInt8}[]
   partialBlock=UInt8[]
   Twistree(sbox,tree2,tree3,partialBlock)
+end
+
+function initialize!(tw::Twistree)
+  # Check for valid S-box
+  if size(tw.sbox)!=(256,3)
+    error("wrong size S-box")
+  end
+  sum=0
+  for i in 0:2
+    for j in 0:255
+      sum+=tw.sbox[j,i]
+    end
+  end
+  if sum!=3*255*128
+    error("invalid S-box")
+  end
+  # Check that the Twistree is empty
+  if length(tw.tree2)>0 || length(tw.tree3)>0 || length(tw.partialBlock)>0
+    error("call finalize before calling initialize again")
+  end
+  push!(tw.tree2,copy(ℯ⁴_2adic))
+  push!(tw.tree3,copy(ℯ⁴_base2))
 end
 
 end # module WringTwistree
