@@ -248,4 +248,24 @@ function compressTriples!(tw::Twistree)
   end
 end
 
+function finalizePairs!(tw::Twistree)
+  for i in eachindex(tw.tree2)
+    compress!(tw.sbox,tw.tree2[i],0)
+    if i<length(tw.tree2)
+      append!(tw.tree2[i+1],tw.tree2[i])
+      empty!(tw.tree2[i])
+    end
+  end
+end
+
+function finalizeTriples!(tw::Twistree)
+  for i in eachindex(tw.tree3)
+    compress!(tw.sbox,tw.tree3[i],1)
+    if i<length(tw.tree3)
+      append!(tw.tree3[i+1],tw.tree3[i])
+      empty!(tw.tree3[i])
+    end
+  end
+end
+
 end # module WringTwistree
