@@ -248,6 +248,108 @@ function compressTriples!(tw::Twistree)
   end
 end
 
+function compressPairs256!(tw::Twistree)
+  i=9
+  while length(tw.tree2[i])>blockSize
+    if i==length(tw.tree2)
+      push!(tw.tree2,UInt8[])
+    end
+    compress!(tw.sbox,tw.tree2[i],0)
+    append!(tw.tree2[i+1],tw.tree2[i])
+    empty!(tw.tree2[i])
+    i+=1
+  end
+end
+
+function compressTriples243!(tw::Twistree)
+  i=6
+  while length(tw.tree3[i])>2*blockSize
+    if i==length(tw.tree3)
+      push!(tw.tree3,UInt8[])
+    end
+    compress!(tw.sbox,tw.tree3[i],1)
+    append!(tw.tree3[i+1],tw.tree3[i])
+    empty!(tw.tree3[i])
+    i+=1
+  end
+end
+
+function compress256Blocks(tw::Twistree,blocks::Vector{Vector{UInt8}},start::Integer)
+  l1=l2=l3=l4=l5=l6=l7=l8=Vector{UInt8}[]
+  for i in 0:127
+    push!(l1,copy(blocks[start+2*i]))
+    append!(l1[i+1],blocks[start+2*i+1])
+    compress!(tw.sbox,l1[i+1],0)
+  end
+  for i in 0:63
+    push!(l2,l1[2*i+1])
+    append!(l2[i+1],l1[2*i+2])
+    compress!(tw.sbox,l2[i+1],0)
+  end
+  for i in 0:31
+    push!(l3,l2[2*i+1])
+    append!(l3[i+1],l2[2*i+2])
+    compress!(tw.sbox,l3[i+1],0)
+  end
+  for i in 0:15
+    push!(l4,l3[2*i+1])
+    append!(l4[i+1],l3[2*i+2])
+    compress!(tw.sbox,l4[i+1],0)
+  end
+  for i in 0:7
+    push!(l5,l4[2*i+1])
+    append!(l5[i+1],l4[2*i+2])
+    compress!(tw.sbox,l5[i+1],0)
+  end
+  for i in 0:3
+    push!(l6,l5[2*i+1])
+    append!(l6[i+1],l5[2*i+2])
+    compress!(tw.sbox,l6[i+1],0)
+  end
+  for i in 0:1
+    push!(l7,l6[2*i+1])
+    append!(l7[i+1],l6[2*i+2])
+    compress!(tw.sbox,l7[i+1],0)
+  end
+  push!(l8,l7[1])
+  append!(l8[1],l7[2])
+  compress!(tw.sbox,l8[1],0)
+  l8[1]
+end
+
+function compress243Blocks(tw::Twistree,blocks::Vector{Vector{UInt8}},start::Integer)
+  l1=l2=l3=l4=l5=Vector{UInt8}[]
+  for i in 0:80
+    push!(l1,copy(blocks[start+3*i]))
+    append!(l1[i+1],blocks[start+3*i+1])
+    append!(l1[i+1],blocks[start+3*i+2])
+    compress!(tw.sbox,l1[i+1],1)
+  end
+  for i in 0:26
+    push!(l2,l1[3*i+1])
+    append!(l2[i+1],l1[3*i+2])
+    append!(l2[i+1],l1[3*i+3])
+    compress!(tw.sbox,l2[i+1],1)
+  end
+  for i in 0:8
+    push!(l3,l2[3*i+1])
+    append!(l3[i+1],l2[3*i+2])
+    append!(l3[i+1],l2[3*i+3])
+    compress!(tw.sbox,l3[i+1],1)
+  end
+  for i in 0:2
+    push!(l4,l3[3*i+1])
+    append!(l4[i+1],l3[3*i+2])
+    append!(l4[i+1],l3[3*i+3])
+    compress!(tw.sbox,l4[i+1],1)
+  end
+  push!(l5,l4[1])
+  append!(l5[1],l4[2])
+  append!(l5[1],l4[3])
+  compress!(tw.sbox,l5[1],1)
+  l5[1]
+end
+
 function finalizePairs!(tw::Twistree)
   for i in eachindex(tw.tree2)
     compress!(tw.sbox,tw.tree2[i],0)
@@ -280,19 +382,24 @@ end
 function update2!(tw::Twistree,blocks::Vector{Vector{UInt8}})
   head=0
   len=length(blocks)
-  for i in reverse(8:1)
+  for i in reverse(1:8)
     if i<=length(tw.tree2)
-      head=2*head+length(tw.tree2[i]÷blockSize)
+      head=2*head+length(tw.tree2[i])÷blockSize
     end
   end # the number of blocks already pushed into tree2 mod 256
+  println("head=",head)
   if head>0
     head=256-head
   end # the number of more blocks to push to get a multiple of 256
+  if head>len
+    head=len
+  end
   body=(len-head)÷256
   if body<0
     body=0
   end
   tail=head+256*body
+  println("head=",head," body=",body," tail=",tail)
   for i in 1:head
     append!(tw.tree2[1],blocks[i])
     compressPairs!(tw)
@@ -312,11 +419,14 @@ end
 function update3!(tw::Twistree,blocks::Vector{Vector{UInt8}})
   head=0
   len=length(blocks)
-  for i in reverse(5:1)
+  for i in reverse(1:5)
     if i<=length(tw.tree3)
-      head=3*head+length(tw.tree2[i]÷blockSize)
+      head=3*head+length(tw.tree2[i])÷blockSize
     end
   end # the number of blocks already pushed into tree3 mod 243
+  if head>len
+    head=len
+  end
   if head>0
     head=243-head
   end # the number of more blocks to push to get a multiple of 243
@@ -350,13 +460,18 @@ function updatePar!(tw::Twistree,blocks::Vector{Vector{UInt8}})
   end
 end
 
+function updateParSeq!(tw::Twistree,blocks::Vector{Vector{UInt8}})
+  update2!(tw,blocks)
+  update3!(tw,blocks)
+end
+
 function update!(tw::Twistree,data::Vector{UInt8})
   # Check that the Twistree has been initialized
   if length(tw.tree2)==0 || length(tw.tree3)==0
     error("call initialize before update")
   end
   blocks=blockize!(data,tw.partialBlock)
-  updatePar!(tw,blocks)
+  updateParSeq!(tw,blocks)
 end
 
 function finalize!(tw::Twistree)
