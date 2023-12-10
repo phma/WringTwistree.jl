@@ -18,6 +18,7 @@ twistree96 = keyedTwistree(key96)
 twistree30 = keyedTwistree(key30)
 twistree6 = keyedTwistree(key6)
 twistree0 = keyedTwistree("")
+text59049 = map(WringTwistree.xorn,collect(1:59049))
 
 function testVectorWring(wring,plaintext,ciphertext)
   plaintext=Vector{UInt8}(plaintext)
@@ -231,3 +232,11 @@ end
 
 # Test parallel Wring
 @test testParallelWring(wring96,key96)
+
+# Test parallel Twistree
+@test testVectorTwistree(twistree96,text59049,
+			 [ 0xd2, 0xe3, 0x0f, 0x01, 0xa0, 0x32, 0x27, 0x51
+			 , 0x4e, 0x56, 0x44, 0xf1, 0x8f, 0x2e, 0x3e, 0xeb 
+			 , 0xdb, 0x14, 0x30, 0xba, 0x96, 0x2c, 0x47, 0x24
+			 , 0x4b, 0x79, 0x39, 0x58, 0xbc, 0x4f, 0x79, 0x25
+			 ]);
