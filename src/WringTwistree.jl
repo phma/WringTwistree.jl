@@ -404,11 +404,16 @@ function update2!(tw::Twistree,blocks::Vector{Vector{UInt8}})
     append!(tw.tree2[1],blocks[i])
     compressPairs!(tw)
   end
+  bodyHash=OffsetArray(Vector{UInt8}[],0:-1)
   for i in 0:body-1
-    for j in (head+1+256*i):(head+256*(i+1))
-      append!(tw.tree2[1],blocks[j])
-      compressPairs!(tw)
-    end
+    push!(bodyHash,UInt8[])
+  end
+  for i in 0:body-1
+    bodyHash[i]=compress256Blocks(tw,blocks,head+1+256*i)
+  end
+  for i in 0:body-1
+    append!(tw.tree2[9],bodyHash[i])
+    compressPairs256!(tw)
   end
   for i in tail+1:len
     append!(tw.tree2[1],blocks[i])
