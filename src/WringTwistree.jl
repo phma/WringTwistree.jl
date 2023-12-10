@@ -274,16 +274,16 @@ function updateSeq!(tw::Twistree,blocks::Vector{Vector{UInt8}})
     error("call initialize before update")
   end
   for i in eachindex(blocks)
-    append!(tw.tree2[0],blocks[i])
+    append!(tw.tree2[1],blocks[i])
     compressPairs!(tw)
-    append!(tw.tree3[0],blocks[i])
+    append!(tw.tree3[1],blocks[i])
     compressTriples!(tw)
   end
 end
 
 function update!(tw::Twistree,data::Vector{UInt8})
   blocks=blockize!(data,tw.partialBlock)
-  updateSeq(tw,blocks)
+  updateSeq!(tw,blocks)
 end
 
 function finalize!(tw::Twistree)
@@ -301,6 +301,8 @@ function finalize!(tw::Twistree)
   fruit=copy(last(tw.tree2))
   append!(fruit,last(tw.tree3))
   compress!(tw.sbox,fruit,2)
+  empty!(tw.tree2)
+  empty!(tw.tree3)
   fruit
 end
 
