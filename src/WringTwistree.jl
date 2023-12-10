@@ -269,10 +269,6 @@ function finalizeTriples!(tw::Twistree)
 end
 
 function updateSeq!(tw::Twistree,blocks::Vector{Vector{UInt8}})
-  # Check that the Twistree has been initialized
-  if length(tw.tree2)==0 || length(tw.tree3)==0
-    error("call initialize before update")
-  end
   for i in eachindex(blocks)
     append!(tw.tree2[1],blocks[i])
     compressPairs!(tw)
@@ -281,9 +277,36 @@ function updateSeq!(tw::Twistree,blocks::Vector{Vector{UInt8}})
   end
 end
 
+function update2!(tw::Twistree,blocks::Vector{Vector{UInt8}})
+  for i in eachindex(blocks)
+    append!(tw.tree2[1],blocks[i])
+    compressPairs!(tw)
+  end
+end
+
+function update3!(tw::Twistree,blocks::Vector{Vector{UInt8}})
+  for i in eachindex(blocks)
+    append!(tw.tree3[1],blocks[i])
+    compressTriples!(tw)
+  end
+end
+
+function updatePar!(tw::Twistree,blocks::Vector{Vector{UInt8}})
+  tasks=Task[]
+  push!(tasks,@spawn update2!(tw,blocks))
+  push!(tasks,@spawn update3!(tw,blocks))
+  for i in 1:2
+    wait(tasks[i])
+  end
+end
+
 function update!(tw::Twistree,data::Vector{UInt8})
+  # Check that the Twistree has been initialized
+  if length(tw.tree2)==0 || length(tw.tree3)==0
+    error("call initialize before update")
+  end
   blocks=blockize!(data,tw.partialBlock)
-  updateSeq!(tw,blocks)
+  updatePar!(tw,blocks)
 end
 
 function finalize!(tw::Twistree)
