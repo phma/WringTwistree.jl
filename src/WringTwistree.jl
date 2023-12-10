@@ -8,7 +8,7 @@ using OffsetArrays,Base.Threads
 using .Mix3,.RotBitcount,.Sboxes,.Compress,.Blockize
 export carmichael,findMaxOrder
 export keyedWring,encryptSeq!,decryptSeq!,encryptPar!,decryptPar!,encrypt!,decrypt!
-export keyedTwistree,initialize!
+export keyedTwistree,initialize!,update!,finalize!
 export sboxes,relPrimes,compress!,ℯ⁴_2adic,ℯ⁴_base2,blockize!,pad!
 # carmichael is exported in case someone wants the Carmichael function,
 # which I couldn't find.
@@ -266,6 +266,42 @@ function finalizeTriples!(tw::Twistree)
       empty!(tw.tree3[i])
     end
   end
+end
+
+function updateSeq!(tw::Twistree,blocks::Vector{Vector{UInt8}})
+  # Check that the Twistree has been initialized
+  if length(tw.tree2)==0 || length(tw.tree3)==0
+    error("call initialize before update")
+  end
+  for i in eachindex(blocks)
+    append!(tw.tree2[0],blocks[i])
+    compressPairs!(tw)
+    append!(tw.tree3[0],blocks[i])
+    compressTriples!(tw)
+  end
+end
+
+function update!(tw::Twistree,data::Vector{UInt8})
+  blocks=blockize!(data,tw.partialBlock)
+  updateSeq(tw,blocks)
+end
+
+function finalize!(tw::Twistree)
+  # Check that the Twistree has been initialized
+  if length(tw.tree2)==0 || length(tw.tree3)==0
+    error("call initialize before update")
+  end
+  lastBlock=pad!(tw.partialBlock)
+  append!(tw.tree2[1],lastBlock)
+  compressPairs!(tw)
+  finalizePairs!(tw)
+  append!(tw.tree3[1],lastBlock)
+  compressTriples!(tw)
+  finalizeTriples!(tw)
+  fruit=copy(last(tw.tree2))
+  append!(fruit,last(tw.tree3))
+  compress!(tw.sbox,fruit,2)
+  fruit
 end
 
 end # module WringTwistree
