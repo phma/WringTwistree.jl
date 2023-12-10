@@ -278,14 +278,64 @@ function updateSeq!(tw::Twistree,blocks::Vector{Vector{UInt8}})
 end
 
 function update2!(tw::Twistree,blocks::Vector{Vector{UInt8}})
-  for i in eachindex(blocks)
+  head=0
+  len=length(blocks)
+  for i in reverse(8:1)
+    if i<=length(tw.tree2)
+      head=2*head+length(tw.tree2[i]÷blockSize)
+    end
+  end # the number of blocks already pushed into tree2 mod 256
+  if head>0
+    head=256-head
+  end # the number of more blocks to push to get a multiple of 256
+  body=(len-head)÷256
+  if body<0
+    body=0
+  end
+  tail=head+256*body
+  for i in 1:head
+    append!(tw.tree2[1],blocks[i])
+    compressPairs!(tw)
+  end
+  for i in 0:body-1
+    for j in (head+1+256*i):(head+256*(i+1))
+      append!(tw.tree2[1],blocks[j])
+      compressPairs!(tw)
+    end
+  end
+  for i in tail+1:len
     append!(tw.tree2[1],blocks[i])
     compressPairs!(tw)
   end
 end
 
 function update3!(tw::Twistree,blocks::Vector{Vector{UInt8}})
-  for i in eachindex(blocks)
+  head=0
+  len=length(blocks)
+  for i in reverse(5:1)
+    if i<=length(tw.tree3)
+      head=3*head+length(tw.tree2[i]÷blockSize)
+    end
+  end # the number of blocks already pushed into tree3 mod 243
+  if head>0
+    head=243-head
+  end # the number of more blocks to push to get a multiple of 243
+  body=(len-head)÷243
+  if body<0
+    body=0
+  end
+  tail=head+243*body
+  for i in 1:head
+    append!(tw.tree3[1],blocks[i])
+    compressTriples!(tw)
+  end
+  for i in 0:body-1
+    for j in (head+1+243*i):(head+243*(i+1))
+      append!(tw.tree3[1],blocks[j])
+      compressTriples!(tw)
+    end
+  end
+  for i in tail+1:len
     append!(tw.tree3[1],blocks[i])
     compressTriples!(tw)
   end
