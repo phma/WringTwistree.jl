@@ -8,7 +8,7 @@ using OffsetArrays,Base.Threads
 using .Mix3,.RotBitcount,.Sboxes,.Compress,.Blockize
 export carmichael,findMaxOrder
 export keyedWring,encryptSeq!,decryptSeq!,encryptPar!,decryptPar!,encrypt!,decrypt!
-export keyedTwistree,initialize!,update!,finalize!
+export keyedTwistree,initialize!,update!,finalize!,hash!
 export sboxes,relPrimes,compress!,ℯ⁴_2adic,ℯ⁴_base2,blockize!,pad!
 # carmichael is exported in case someone wants the Carmichael function,
 # which I couldn't find.
@@ -503,6 +503,13 @@ function finalize!(tw::Twistree)
   empty!(tw.tree2)
   empty!(tw.tree3)
   fruit
+end
+
+function hash!(tw::Twistree,data::Vector{UInt8})
+  # convenience function if the data all fit in RAM
+  initialize!(tw)
+  update!(tw,data)
+  finalize!(tw)
 end
 
 end # module WringTwistree
