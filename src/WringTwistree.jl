@@ -228,6 +228,9 @@ function compressPairs!(tw::Twistree)
     if i==length(tw.tree2)
       push!(tw.tree2,UInt8[])
     end
+    if i==9
+      println(tw.tree2[i])
+    end
     compress!(tw.sbox,tw.tree2[i],0)
     append!(tw.tree2[i+1],tw.tree2[i])
     empty!(tw.tree2[i])
@@ -253,6 +256,9 @@ function compressPairs256!(tw::Twistree)
   while length(tw.tree2[i])>blockSize
     if i==length(tw.tree2)
       push!(tw.tree2,UInt8[])
+    end
+    if i==9
+      println(tw.tree2[i])
     end
     compress!(tw.sbox,tw.tree2[i],0)
     append!(tw.tree2[i+1],tw.tree2[i])
