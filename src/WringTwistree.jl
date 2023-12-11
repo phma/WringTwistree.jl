@@ -222,6 +222,7 @@ function initialize!(tw::Twistree)
   end
   push!(tw.tree2,copy(ℯ⁴_2adic))
   push!(tw.tree3,copy(ℯ⁴_base2))
+  return nothing
 end
 
 function compressPairs!(tw::Twistree)
