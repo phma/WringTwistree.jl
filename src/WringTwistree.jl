@@ -10,6 +10,7 @@ export carmichael,findMaxOrder
 export keyedWring,encryptSeq!,decryptSeq!,encryptPar!,decryptPar!,encrypt!,decrypt!
 export keyedTwistree,initialize!,update!,finalize!,hash!
 export sboxes,relPrimes,compress!,ℯ⁴_2adic,ℯ⁴_base2,blockize!,pad!
+export key96,twistree96,text59049
 # carmichael is exported in case someone wants the Carmichael function,
 # which I couldn't find.
 # findMaxOrder is needed for test.
@@ -511,5 +512,9 @@ function hash!(tw::Twistree,data::Vector{UInt8})
   update!(tw,data)
   finalize!(tw)
 end
+
+key96 = "Водворетраванатраведрова.Нерубидрованатраведвора!"
+twistree96 = keyedTwistree(key96)
+text59049 = map(WringTwistree.xorn,collect(1:59049))
 
 end # module WringTwistree
