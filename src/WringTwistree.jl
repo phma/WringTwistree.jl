@@ -10,6 +10,7 @@ export carmichael,findMaxOrder
 export keyedWring,encryptSeq!,decryptSeq!,encryptPar!,decryptPar!,encrypt!,decrypt!
 export keyedTwistree,initialize!,update!,finalize!,hash!
 export sboxes,relPrimes,compress!,ℯ⁴_2adic,ℯ⁴_base2,blockize!,pad!
+export compress256Blocks
 export key96,twistree96,text59049
 # carmichael is exported in case someone wants the Carmichael function,
 # which I couldn't find.
@@ -282,7 +283,15 @@ function compressTriples243!(tw::Twistree)
 end
 
 function compress256Blocks(tw::Twistree,blocks::Vector{Vector{UInt8}},start::Integer)
-  l1=l2=l3=l4=l5=l6=l7=l8=Vector{UInt8}[]
+  l1=Vector{UInt8}[]
+  l2=Vector{UInt8}[]
+  l3=Vector{UInt8}[]
+  l4=Vector{UInt8}[]
+  l5=Vector{UInt8}[]
+  l6=Vector{UInt8}[]
+  l7=Vector{UInt8}[]
+  l8=Vector{UInt8}[]
+  println("start=",start)
   for i in 0:127
     push!(l1,copy(blocks[start+2*i]))
     append!(l1[i+1],blocks[start+2*i+1])
@@ -325,7 +334,11 @@ function compress256Blocks(tw::Twistree,blocks::Vector{Vector{UInt8}},start::Int
 end
 
 function compress243Blocks(tw::Twistree,blocks::Vector{Vector{UInt8}},start::Integer)
-  l1=l2=l3=l4=l5=Vector{UInt8}[]
+  l1=Vector{UInt8}[]
+  l2=Vector{UInt8}[]
+  l3=Vector{UInt8}[]
+  l4=Vector{UInt8}[]
+  l5=Vector{UInt8}[]
   for i in 0:80
     push!(l1,copy(blocks[start+3*i]))
     append!(l1[i+1],blocks[start+3*i+1])
