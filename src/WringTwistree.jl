@@ -522,8 +522,6 @@ function hash!(tw::Twistree,data::Vector{UInt8})
   finalize!(tw)
 end
 
-key96 = "Водворетраванатраведрова.Нерубидрованатраведвора!"
-twistree96 = keyedTwistree(key96)
-text59049 = map(WringTwistree.xorn,collect(1:59049))
+include("benchmark.jl")
 
 end # module WringTwistree
