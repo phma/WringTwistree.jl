@@ -482,13 +482,20 @@ function updatePar!(tw::Twistree,blocks::Vector{Vector{UInt8}})
   end
 end
 
-function update!(tw::Twistree,data::Vector{UInt8})
+function update!(tw::Twistree,data::Vector{UInt8},parseq::Symbol=:default)
   # Check that the Twistree has been initialized
   if length(tw.tree2)==0 || length(tw.tree3)==0
     error("call initialize before update")
   end
   blocks=blockize!(data,tw.partialBlock)
-  updatePar!(tw,blocks)
+  if parseq==:default
+    # TBD
+  end
+  if parseq==:sequential
+    updateSeq!(tw,blocks)
+  else
+    updatePar!(tw,blocks)
+  end
 end
 
 function finalize!(tw::Twistree)
@@ -511,10 +518,10 @@ function finalize!(tw::Twistree)
   fruit
 end
 
-function hash!(tw::Twistree,data::Vector{UInt8})
+function hash!(tw::Twistree,data::Vector{UInt8},parseq::Symbol=:default)
   # convenience function if the data all fit in RAM
   initialize!(tw)
-  update!(tw,data)
+  update!(tw,data,parseq)
   finalize!(tw)
 end
 
