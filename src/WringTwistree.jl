@@ -230,9 +230,6 @@ function compressPairs!(tw::Twistree)
     if i==length(tw.tree2)
       push!(tw.tree2,UInt8[])
     end
-    if i==9
-      println(tw.tree2[i])
-    end
     compress!(tw.sbox,tw.tree2[i],0)
     append!(tw.tree2[i+1],tw.tree2[i])
     empty!(tw.tree2[i])
@@ -258,9 +255,6 @@ function compressPairs256!(tw::Twistree)
   while length(tw.tree2[i])>blockSize
     if i==length(tw.tree2)
       push!(tw.tree2,UInt8[])
-    end
-    if i==9
-      println(tw.tree2[i])
     end
     compress!(tw.sbox,tw.tree2[i],0)
     append!(tw.tree2[i+1],tw.tree2[i])
@@ -291,7 +285,6 @@ function compress256Blocks(tw::Twistree,blocks::Vector{Vector{UInt8}},start::Int
   l6=Vector{UInt8}[]
   l7=Vector{UInt8}[]
   l8=Vector{UInt8}[]
-  println("start=",start)
   for i in 0:127
     push!(l1,copy(blocks[start+2*i]))
     append!(l1[i+1],blocks[start+2*i+1])
@@ -407,7 +400,6 @@ function update2!(tw::Twistree,blocks::Vector{Vector{UInt8}})
       head=2*head+length(tw.tree2[i])÷blockSize
     end
   end # the number of blocks already pushed into tree2 mod 256
-  #println("head=",head)
   if head>0
     head=256-head
   end # the number of more blocks to push to get a multiple of 256
@@ -419,7 +411,6 @@ function update2!(tw::Twistree,blocks::Vector{Vector{UInt8}})
     body=0
   end
   tail=head+256*body
-  #println("head=",head," body=",body," tail=",tail)
   for i in 1:head
     append!(tw.tree2[1],blocks[i])
     compressPairs!(tw)
@@ -449,7 +440,6 @@ function update3!(tw::Twistree,blocks::Vector{Vector{UInt8}})
       head=3*head+length(tw.tree3[i])÷blockSize
     end
   end # the number of blocks already pushed into tree3 mod 243
-  println("head=",head)
   if head>0
     head=243-head
   end # the number of more blocks to push to get a multiple of 243
@@ -461,7 +451,6 @@ function update3!(tw::Twistree,blocks::Vector{Vector{UInt8}})
     body=0
   end
   tail=head+243*body
-  println("head=",head," body=",body," tail=",tail)
   for i in 1:head
     append!(tw.tree3[1],blocks[i])
     compressTriples!(tw)
