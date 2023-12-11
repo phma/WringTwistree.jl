@@ -407,7 +407,7 @@ function update2!(tw::Twistree,blocks::Vector{Vector{UInt8}})
       head=2*head+length(tw.tree2[i])÷blockSize
     end
   end # the number of blocks already pushed into tree2 mod 256
-  println("head=",head)
+  #println("head=",head)
   if head>0
     head=256-head
   end # the number of more blocks to push to get a multiple of 256
@@ -419,7 +419,7 @@ function update2!(tw::Twistree,blocks::Vector{Vector{UInt8}})
     body=0
   end
   tail=head+256*body
-  println("head=",head," body=",body," tail=",tail)
+  #println("head=",head," body=",body," tail=",tail)
   for i in 1:head
     append!(tw.tree2[1],blocks[i])
     compressPairs!(tw)
@@ -446,29 +446,36 @@ function update3!(tw::Twistree,blocks::Vector{Vector{UInt8}})
   len=length(blocks)
   for i in reverse(1:5)
     if i<=length(tw.tree3)
-      head=3*head+length(tw.tree2[i])÷blockSize
+      head=3*head+length(tw.tree3[i])÷blockSize
     end
   end # the number of blocks already pushed into tree3 mod 243
-  if head>len
-    head=len
-  end
+  println("head=",head)
   if head>0
     head=243-head
   end # the number of more blocks to push to get a multiple of 243
+  if head>len
+    head=len
+  end
   body=(len-head)÷243
   if body<0
     body=0
   end
   tail=head+243*body
+  println("head=",head," body=",body," tail=",tail)
   for i in 1:head
     append!(tw.tree3[1],blocks[i])
     compressTriples!(tw)
   end
+  bodyHash=OffsetArray(Vector{UInt8}[],0:-1)
   for i in 0:body-1
-    for j in (head+1+243*i):(head+243*(i+1))
-      append!(tw.tree3[1],blocks[j])
-      compressTriples!(tw)
-    end
+    push!(bodyHash,UInt8[])
+  end
+  for i in 0:body-1
+    bodyHash[i]=compress243Blocks(tw,blocks,head+1+243*i)
+  end
+  for i in 0:body-1
+    append!(tw.tree3[6],bodyHash[i])
+    compressTriples243!(tw)
   end
   for i in tail+1:len
     append!(tw.tree3[1],blocks[i])
