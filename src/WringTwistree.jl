@@ -16,6 +16,9 @@ export key96,twistree96,text59049
 # which I couldn't find.
 # findMaxOrder is needed for test.
 
+#--------------------------------------------------------------
+# Wring is a whole-message cipher.
+
 const parBig::Int=1000
 
 function nRounds(len::Integer)
@@ -187,6 +190,9 @@ function decrypt!(wring::Wring,buf::Vector{UInt8})
   end
 end
 
+#--------------------------------------------------------------
+# Twistree is a hash function.
+
 mutable struct Twistree
   sbox		::OffsetArray{UInt8}
   tree2		::Vector{Vector{UInt8}}
@@ -194,7 +200,26 @@ mutable struct Twistree
   partialBlock	::Vector{UInt8}
 end
 
-function keyedTwistree(key) # key is a String or Vector{UInt8}
+"""
+    keyedTwistree(key)
+
+Create a Twistree which can be used to hash a Vector{UInt8}.
+The key can be a String or Vector{UInt8} and should be at longest 96 bytes.
+For an unkeyed hash, use an empty string.
+
+# Examples
+
+```julia-repl
+julia> tw=keyedTwistree("aoeu")
+WringTwistree.Twistree(UInt8[0x99 0x5e 0xc9; 0xd6 0xf9 0x17; … ;
+0x28 0xc8 0x32; 0xb0 0x81 0x99], Vector{UInt8}[], Vector{UInt8}[], UInt8[])
+
+julia> tw0=keyedTwistree("")
+WringTwistree.Twistree(UInt8[0x59 0xe9 0xe7; 0xdb 0x13 0x00; … ;
+0xfc 0x76 0x38; 0x27 0x55 0xfd], Vector{UInt8}[], Vector{UInt8}[], UInt8[])
+```
+"""
+function keyedTwistree(key)
   sbox=sboxes(key)
   tree2=Vector{UInt8}[]
   tree3=Vector{UInt8}[]
@@ -202,6 +227,11 @@ function keyedTwistree(key) # key is a String or Vector{UInt8}
   Twistree(sbox,tree2,tree3,partialBlock)
 end
 
+"""
+    initialize!(tw::Twistree)
+
+Initialize a Twistree. Do this before calling `update!` and `finalize!`.
+"""
 function initialize!(tw::Twistree)
   # Check for valid S-box
   if size(tw.sbox)!=(256,3)
@@ -482,6 +512,25 @@ function updatePar!(tw::Twistree,blocks::Vector{Vector{UInt8}})
   end
 end
 
+"""
+    update!(tw,data::Vector{UInt8}[,parseq])
+
+Update a Twistree with some data. `parseq` can be
+- :sequential
+- :parallel
+- :default
+
+# Examples:
+```julia
+  tw=keyedTwistree("")
+  initialize!(tw)
+  buf=read(file,65536)
+  update!(tw,buf)
+  buf=read(file,65536)
+  update!(tw,buf)
+  hash=finalize!(tw)
+```
+"""
 function update!(tw::Twistree,data::Vector{UInt8},parseq::Symbol=:default)
   # Check that the Twistree has been initialized
   if length(tw.tree2)==0 || length(tw.tree3)==0
@@ -498,6 +547,12 @@ function update!(tw::Twistree,data::Vector{UInt8},parseq::Symbol=:default)
   end
 end
 
+"""
+    finalize!(tw::Twistree)
+
+Complete processing the data in the Twistree and return the hash.
+Use after `initialize!` and `update!`.
+"""
 function finalize!(tw::Twistree)
   # Check that the Twistree has been initialized
   if length(tw.tree2)==0 || length(tw.tree3)==0
