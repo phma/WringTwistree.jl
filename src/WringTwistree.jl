@@ -419,7 +419,7 @@ function update2!(tw::Twistree,blocks::Vector{Vector{UInt8}})
   for i in 0:body-1
     push!(bodyHash,UInt8[])
   end
-  for i in 0:body-1
+  @threads for i in 0:body-1
     bodyHash[i]=compress256Blocks(tw,blocks,head+1+256*i)
   end
   for i in 0:body-1
@@ -459,7 +459,7 @@ function update3!(tw::Twistree,blocks::Vector{Vector{UInt8}})
   for i in 0:body-1
     push!(bodyHash,UInt8[])
   end
-  for i in 0:body-1
+  @threads for i in 0:body-1
     bodyHash[i]=compress243Blocks(tw,blocks,head+1+243*i)
   end
   for i in 0:body-1
@@ -481,18 +481,13 @@ function updatePar!(tw::Twistree,blocks::Vector{Vector{UInt8}})
   end
 end
 
-function updateParSeq!(tw::Twistree,blocks::Vector{Vector{UInt8}})
-  update2!(tw,blocks)
-  update3!(tw,blocks)
-end
-
 function update!(tw::Twistree,data::Vector{UInt8})
   # Check that the Twistree has been initialized
   if length(tw.tree2)==0 || length(tw.tree3)==0
     error("call initialize before update")
   end
   blocks=blockize!(data,tw.partialBlock)
-  updateParSeq!(tw,blocks)
+  updatePar!(tw,blocks)
 end
 
 function finalize!(tw::Twistree)
