@@ -14,9 +14,17 @@ function rotBitcountSeq!(src::Vector{UInt8},dst::Vector{UInt8},mult::Integer)
   len=length(src)
   @assert len==length(dst) "rotBitcount: size mismatch"
   @assert src!==dst "rotBitcount: src and dst must be different"
-  multmod=mod(mult,len*8)
-  @inbounds bitcount=mapreduce(count_ones,+,src)
-  rotcount=(bitcount*multmod)%(len*8)
+  if len>0
+    multmod=mod(mult,len*8)
+  else
+    multmod=mult
+  end
+  @inbounds bitcount=mapreduce(count_ones,+,src,init=0)
+  if len>0
+    rotcount=(bitcount*multmod)%(len*8)
+  else
+    rotcount=bitcount*multmod
+  end
   byte=rotcount>>3
   bit=rotcount&7
   for i in 1:len
@@ -29,9 +37,17 @@ function rotBitcountPar!(src::Vector{UInt8},dst::Vector{UInt8},mult::Integer)
   len=length(src)
   @assert len==length(dst) "rotBitcount: size mismatch"
   @assert src!==dst "rotBitcount: src and dst must be different"
-  multmod=mod(mult,len*8)
-  @inbounds bitcount=mapreduce(count_ones,+,src)
-  rotcount=(bitcount*multmod)%(len*8)
+  if len>0
+    multmod=mod(mult,len*8)
+  else
+    multmod=mult
+  end
+  @inbounds bitcount=mapreduce(count_ones,+,src,init=0)
+  if len>0
+    rotcount=(bitcount*multmod)%(len*8)
+  else
+    rotcount=bitcount*multmod
+  end
   byte=rotcount>>3
   bit=rotcount&7
   @threads for i in 1:len
