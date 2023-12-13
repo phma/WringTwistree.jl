@@ -25,7 +25,7 @@ end,0:255)
 
 function backCrc!(src::Vector{<:Integer},dst::Vector{<:Integer})
   acc=0xdeadc0de
-  for i in reverse(eachindex(src))
+  @inbounds for i in reverse(eachindex(src))
     acc=(acc>>8)⊻lfsr[acc&255]⊻src[i]
     dst[i]=acc&255
   end
@@ -37,7 +37,7 @@ function roundCompress!(sbox::OffsetArray{UInt8},buf::Vector{UInt8},sboxalt::Int
   len=length(buf)÷3
   mix3PartsSeq!(buf,rprime);
   for i in eachindex(buf)
-    buf[i]=sbox[buf[i],(sboxalt+i-1)%3]
+    @inbounds buf[i]=sbox[buf[i],(sboxalt+i-1)%3]
   end
   rotBitcountSeq!(buf,tmp,twistPrime)
   backCrc!(tmp,buf)
