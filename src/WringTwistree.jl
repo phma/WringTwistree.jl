@@ -194,16 +194,30 @@ function decryptPar!(wring::Wring,buf::Vector{UInt8})
   end
 end
 
-function encrypt!(wring::Wring,buf::Vector{UInt8})
-  if length(buf)>parBig
+function encrypt!(wring::Wring,buf::Vector{UInt8},parseq::Symbol=:default)
+  if parseq==:default
+    if length(buf)>parBig
+      parseq=:parallel
+    else
+      parseq=:sequential
+    end
+  end
+  if parseq==:parallel
     encryptPar!(wring,buf)
   else
     encryptSeq!(wring,buf)
   end
 end
 
-function decrypt!(wring::Wring,buf::Vector{UInt8})
-  if length(buf)>parBig
+function decrypt!(wring::Wring,buf::Vector{UInt8},parseq::Symbol=:default)
+  if parseq==:default
+    if length(buf)>parBig
+      parseq=:parallel
+    else
+      parseq=:sequential
+    end
+  end
+  if parseq==:parallel
     decryptPar!(wring,buf)
   else
     decryptSeq!(wring,buf)
