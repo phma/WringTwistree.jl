@@ -18,3 +18,7 @@ resist linear cryptanalysis.
 # Julia
 This is a Julia implementation. The reference implementations, in Rust and Haskell, are in the `wring-twistree` repo.
 
+In the project directory, run `julia --project` at the shell prompt, then in Julia run `using WringTwistree`. You probably want `export JULIA_NUM_THREADS=auto` in your `.profile`, as the algorithms run faster on big inputs when multithreaded. You can then create a Wring, a Twistree, and some byte vectors and encrypt and hash them.
+
+# Test vectors
+Test vectors are in `test/runtests.jl`. To run them, type `]` to enter Pkg mode, then `test`.
