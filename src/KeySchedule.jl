@@ -34,7 +34,7 @@ end
 function keySchedule(key::Vector{UInt8})
   subkey=OffsetArray(UInt16[1],0:0)
   while length(subkey)<96
-    push!(subkey,bitrotate(last(subkey)*0xd,8))
+    push!(subkey,bswap(last(subkey)*0xd))
   end
   xkey=extendKey(key)
   for i in 0:length(xkey)-1
