@@ -6,12 +6,9 @@ include("Compress.jl")
 include("Blockize.jl")
 using OffsetArrays,Base.Threads,BenchmarkTools
 using .Mix3,.RotBitcount,.Sboxes,.Compress,.Blockize
-export carmichael,findMaxOrder
+export carmichael
 export keyedWring,encryptSeq!,decryptSeq!,encryptPar!,decryptPar!,encrypt!,decrypt!
 export keyedTwistree,initialize!,update!,finalize!,hash!
-export sboxes,relPrimes,compress!,ℯ⁴_2adic,ℯ⁴_base2,blockize!,pad!
-export compress256Blocks
-export key96,twistree96,text59049,wringBreakEven,twistreeBreakEven
 # carmichael is exported in case someone wants the Carmichael function,
 # which I couldn't find.
 # findMaxOrder is needed for test.
@@ -569,6 +566,10 @@ Update a Twistree with some data. `parseq` can be
 - :parallel
 - :default
 
+If you have more than 62208 bytes of data and they don't fit in RAM,
+you should feed them to `update!` at least 31104 bytes at a time,
+or at least between 7776(*n*+2) and 8192(*n*+2) bytes at a time where 
+*n* is the number of threads your CPU has.
 # Examples:
 ```julia
   tw=keyedTwistree("")
@@ -626,6 +627,13 @@ function finalize!(tw::Twistree)
   fruit
 end
 
+"""
+    hash!(tw,data::Vector{UInt8}[,parseq])
+
+Hashes a block of data that's all in RAM. Equivalent to calling
+`initialize!`, `update!`, and `finalize!`. `parseq` is the same as
+in `update!`.
+"""
 function hash!(tw::Twistree,data::Vector{UInt8},parseq::Symbol=:default)
   # convenience function if the data all fit in RAM
   initialize!(tw)
