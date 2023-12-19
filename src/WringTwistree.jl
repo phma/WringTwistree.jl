@@ -19,7 +19,8 @@ export key96,twistree96,text59049,wringBreakEven,twistreeBreakEven
 #--------------------------------------------------------------
 # Wring is a whole-message cipher.
 
-const parBig::Int=1000
+const parBreakEvenWring::Int=5589
+const parBreakEvenTwistree::Int=1700
 
 function nRounds(len::Integer)
   ret=3
@@ -196,7 +197,7 @@ end
 
 function encrypt!(wring::Wring,buf::Vector{UInt8},parseq::Symbol=:default)
   if parseq==:default
-    if length(buf)>parBig
+    if length(buf)>=parBreakEvenWring
       parseq=:parallel
     else
       parseq=:sequential
@@ -211,7 +212,7 @@ end
 
 function decrypt!(wring::Wring,buf::Vector{UInt8},parseq::Symbol=:default)
   if parseq==:default
-    if length(buf)>parBig
+    if length(buf)>parBreakEvenWring
       parseq=:parallel
     else
       parseq=:sequential
@@ -448,12 +449,26 @@ function finalizeTriples!(tw::Twistree)
   end
 end
 
-function updateSeq!(tw::Twistree,blocks::Vector{Vector{UInt8}})
+function update2seq!(tw::Twistree,blocks::Vector{Vector{UInt8}})
   for i in eachindex(blocks)
     append!(tw.tree2[1],blocks[i])
     compressPairs!(tw)
+  end
+end
+
+function update3seq!(tw::Twistree,blocks::Vector{Vector{UInt8}})
+  for i in eachindex(blocks)
     append!(tw.tree3[1],blocks[i])
     compressTriples!(tw)
+  end
+end
+
+function updateSeq!(tw::Twistree,blocks::Vector{Vector{UInt8}})
+  tasks=Task[]
+  push!(tasks,@spawn update2seq!(tw,blocks))
+  push!(tasks,@spawn update3seq!(tw,blocks))
+  for i in 1:2
+    wait(tasks[i])
   end
 end
 
@@ -572,7 +587,11 @@ function update!(tw::Twistree,data::Vector{UInt8},parseq::Symbol=:default)
   end
   blocks=blockize!(data,tw.partialBlock)
   if parseq==:default
-    # TBD
+    if length(blocks)>=parBreakEvenTwistree
+      parseq=:parallel
+    else
+      parseq=:sequential
+    end
   end
   if parseq==:sequential
     updateSeq!(tw,blocks)
