@@ -20,7 +20,7 @@ export key96,twistree96,text59049,wringBreakEven,twistreeBreakEven
 # Wring is a whole-message cipher.
 
 const parBreakEvenWring::Int=5589
-const parBreakEvenTwistree::Int=1700
+const parBreakEvenTwistree::Int=729
 
 function nRounds(len::Integer)
   ret=3
