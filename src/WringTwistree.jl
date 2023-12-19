@@ -11,7 +11,7 @@ export keyedWring,encryptSeq!,decryptSeq!,encryptPar!,decryptPar!,encrypt!,decry
 export keyedTwistree,initialize!,update!,finalize!,hash!
 export sboxes,relPrimes,compress!,ℯ⁴_2adic,ℯ⁴_base2,blockize!,pad!
 export compress256Blocks
-export key96,twistree96,text59049,twistreeTimeRatio
+export key96,twistree96,text59049,twistreeTimeRatio,twistreeBreakEven
 # carmichael is exported in case someone wants the Carmichael function,
 # which I couldn't find.
 # findMaxOrder is needed for test.
