@@ -106,7 +106,10 @@ function mix3PartsPar!(buf::Vector{<:Integer},rprime::Integer)
   b=2*len
   c=2*len+1
   aInc=nthreads()
-  cInc=(rprime*aInc)%len
+  cInc=(rprime*aInc)
+  if len>0
+    cInc%=len
+  end
   tasks=Task[]
   for i in 1:aInc
     #println("Starting task a=",a," b=",b," c=",c," aInc=",aInc," cInc=",cInc)
