@@ -6,6 +6,12 @@ text59049 = map(WringTwistree.xorn,collect(1:59049))
 
 hash!(twistree96,text59049);
 
+function twistreeTime(n::Integer) # in nanoseconds
+  textn=map(WringTwistree.xorn,collect(1:n))
+  trial=@benchmark hash!(twistree96,$textn)
+  median(trial).time
+end
+
 function twistreeTimeRatio(n::Integer)
   textn=map(WringTwistree.xorn,collect(1:n))
   trialSeq=@benchmark hash!(twistree96,$textn,:sequential)
@@ -32,6 +38,12 @@ function twistreeBreakEven()
     end
   end
   midLength
+end
+
+function wringTime(n::Integer) # in nanoseconds
+  textn=map(WringTwistree.xorn,collect(1:n))
+  trial=@benchmark encrypt!(wring96,$textn)
+  median(trial).time
 end
 
 function wringTimeRatio(n::Integer)
