@@ -340,14 +340,22 @@ function compressTriples243!(tw::Twistree)
 end
 
 function compress256Blocks(tw::Twistree,blocks::Vector{Vector{UInt8}},start::Integer)
-  l1=Vector{UInt8}[]
-  l2=Vector{UInt8}[]
-  l3=Vector{UInt8}[]
-  l4=Vector{UInt8}[]
-  l5=Vector{UInt8}[]
-  l6=Vector{UInt8}[]
-  l7=Vector{UInt8}[]
-  l8=Vector{UInt8}[]
+  l1=Vector{Vector{UInt8}}(undef,128)
+  l2=Vector{Vector{UInt8}}(undef,64)
+  l3=Vector{Vector{UInt8}}(undef,32)
+  l4=Vector{Vector{UInt8}}(undef,16)
+  l5=Vector{Vector{UInt8}}(undef,8)
+  l6=Vector{Vector{UInt8}}(undef,4)
+  l7=Vector{Vector{UInt8}}(undef,2)
+  l8=Vector{Vector{UInt8}}(undef,1)
+  empty!(l1)
+  empty!(l2)
+  empty!(l3)
+  empty!(l4)
+  empty!(l5)
+  empty!(l6)
+  empty!(l7)
+  empty!(l8)
   for i in 0:127
     push!(l1,copy(blocks[start+2*i]))
     append!(l1[i+1],blocks[start+2*i+1])
@@ -390,11 +398,16 @@ function compress256Blocks(tw::Twistree,blocks::Vector{Vector{UInt8}},start::Int
 end
 
 function compress243Blocks(tw::Twistree,blocks::Vector{Vector{UInt8}},start::Integer)
-  l1=Vector{UInt8}[]
-  l2=Vector{UInt8}[]
-  l3=Vector{UInt8}[]
-  l4=Vector{UInt8}[]
-  l5=Vector{UInt8}[]
+  l1=Vector{Vector{UInt8}}(undef,81)
+  l2=Vector{Vector{UInt8}}(undef,27)
+  l3=Vector{Vector{UInt8}}(undef,9)
+  l4=Vector{Vector{UInt8}}(undef,3)
+  l5=Vector{Vector{UInt8}}(undef,1)
+  empty!(l1)
+  empty!(l2)
+  empty!(l3)
+  empty!(l4)
+  empty!(l5)
   for i in 0:80
     push!(l1,copy(blocks[start+3*i]))
     append!(l1[i+1],blocks[start+3*i+1])
