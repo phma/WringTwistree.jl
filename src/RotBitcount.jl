@@ -27,9 +27,12 @@ function rotBitcountSeq!(src::Vector{UInt8},dst::Vector{UInt8},mult::Integer)
   end
   byte=rotcount>>3
   bit=rotcount&7
-  for i in 1:len
-    @inbounds dst[i]=(src[(i+len-byte-1)%len+1]<<bit) |
-		     (src[(i+len-byte-2)%len+1]>>(8-bit))
+  for i in 1:byte
+    @inbounds dst[i]=(src[i+len-byte]<<bit) | (src[i+len-byte-1]>>(8-bit))
+  end
+  @inbounds dst[byte+1]=(src[1]<<bit) | (src[len]>>(8-bit))
+  for i in byte+2:len
+    @inbounds dst[i]=(src[i-byte]<<bit) | (src[i-byte-1]>>(8-bit))
   end
 end
 
@@ -50,12 +53,21 @@ function rotBitcountPar!(src::Vector{UInt8},dst::Vector{UInt8},mult::Integer)
   end
   byte=rotcount>>3
   bit=rotcount&7
-  @threads for i in 1:len
-    @inbounds dst[i]=(src[(i+len-byte-1)%len+1]<<bit) |
-		     (src[(i+len-byte-2)%len+1]>>(8-bit))
+  @threads for i in 1:byte
+    @inbounds dst[i]=(src[i+len-byte]<<bit) | (src[i+len-byte-1]>>(8-bit))
+  end
+  @inbounds dst[byte+1]=(src[1]<<bit) | (src[len]>>(8-bit))
+  @threads for i in byte+2:len
+    @inbounds dst[i]=(src[i-byte]<<bit) | (src[i-byte-1]>>(8-bit))
   end
 end
 
+"""
+    cycleRotBitcount(buf::Vector{UInt8})
+
+Repeatedly runs rotBitcount on buf until it repeats. The return value is (a,b),
+where a-b is the cycle length. If b>0, there's a bug.
+"""
 function cycleRotBitcount(buf::Vector{UInt8})
   history=OffsetArray([buf],0:0)
   cycle=(-1,-1)
