@@ -8,7 +8,7 @@ using OffsetArrays,Base.Threads,BenchmarkTools
 using .Mix3,.RotBitcount,.Sboxes,.Compress,.Blockize
 export carmichael
 export keyedWring,encryptSeq!,decryptSeq!,encryptPar!,decryptPar!,encrypt!,decrypt!
-export keyedTwistree,initialize!,update!,finalize!,hash!
+export keyedTwistree,initialize!,update!,finalize!,hash!,cycleRotBitcount
 # carmichael is exported in case someone wants the Carmichael function,
 # which I couldn't find.
 # findMaxOrder is needed for test.

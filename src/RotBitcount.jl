@@ -1,6 +1,6 @@
 module RotBitcount
-using Base.Threads
-export rotBitcountSeq!,rotBitcountPar!
+using Base.Threads,OffsetArrays
+export rotBitcountSeq!,rotBitcountPar!,cycleRotBitcount
 
 # This module is used in both Wring and Twistree.
 # It rotates an array of bytes by a multiple of its bitcount,
@@ -54,6 +54,21 @@ function rotBitcountPar!(src::Vector{UInt8},dst::Vector{UInt8},mult::Integer)
     @inbounds dst[i]=(src[(i+len-byte-1)%len+1]<<bit) |
 		     (src[(i+len-byte-2)%len+1]>>(8-bit))
   end
+end
+
+function cycleRotBitcount(buf::Vector{UInt8})
+  history=OffsetArray([buf],0:0)
+  cycle=(-1,-1)
+  while cycle[1]<0
+    for i in 0:length(history)-2
+      if history[i]==last(history)
+	cycle=(length(history)-1,i)
+      end
+    end
+    push!(history,copy(last(history)))
+    rotBitcountSeq!(history[length(history)-2],last(history),1)
+  end
+  cycle
 end
 
 end
