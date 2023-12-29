@@ -53,12 +53,11 @@ function rotBitcountPar!(src::Vector{UInt8},dst::Vector{UInt8},mult::Integer)
   end
   byte=rotcount>>3
   bit=rotcount&7
-  @threads for i in 1:byte
-    @inbounds dst[i]=(src[i+len-byte]<<bit) | (src[i+len-byte-1]>>(8-bit))
-  end
-  @inbounds dst[byte+1]=(src[1]<<bit) | (src[len]>>(8-bit))
-  @threads for i in byte+2:len
-    @inbounds dst[i]=(src[i-byte]<<bit) | (src[i-byte-1]>>(8-bit))
+  # The alternative to using % is to do two loops, as above, but when parallel,
+  # stopping and starting the threads in the middle takes more time than mods.
+  @threads for i in 1:len
+    @inbounds dst[i]=(src[(i+len-byte-1)%len+1]<<bit) |
+		     (src[(i+len-byte-2)%len+1]>>(8-bit))
   end
 end
 
