@@ -73,3 +73,15 @@ function wringBreakEven()
   end
   midLength
 end
+
+"""
+    setBreakEven()
+
+Compute and set the break-even points for parallel Wring and Twistree.
+Run this when upgrading Julia or installing on a new computer.
+It takes several minutes.
+"""
+function setBreakEven()
+  setBreakEven2(wringBreakEven(),twistreeBreakEven()÷32)
+  @info("Restart Julia for the break-evens to take effect")
+end

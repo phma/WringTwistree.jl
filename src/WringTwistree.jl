@@ -4,11 +4,12 @@ include("RotBitcount.jl")
 include("Sboxes.jl")
 include("Compress.jl")
 include("Blockize.jl")
-using OffsetArrays,Base.Threads,BenchmarkTools
+using OffsetArrays,Base.Threads,BenchmarkTools,Preferences
 using .Mix3,.RotBitcount,.Sboxes,.Compress,.Blockize
 export carmichael
 export keyedWring,encryptSeq!,decryptSeq!,encryptPar!,decryptPar!,encrypt!,decrypt!
 export keyedTwistree,initialize!,update!,finalize!,hash!,cycleRotBitcount
+export setBreakEven # in benchmark
 # carmichael is exported in case someone wants the Carmichael function,
 # which I couldn't find.
 # findMaxOrder is needed for test.
@@ -16,8 +17,13 @@ export keyedTwistree,initialize!,update!,finalize!,hash!,cycleRotBitcount
 #--------------------------------------------------------------
 # Wring is a whole-message cipher.
 
-const parBreakEvenWring::Int=5589
-const parBreakEvenTwistree::Int=729
+const parBreakEvenWring::Int=@load_preference("parBreakEvenWring",typemax(Int))
+const parBreakEvenTwistree::Int=@load_preference("parBreakEvenTwistree",typemax(Int))
+
+function setBreakEven2(beWring::Int,beTwistree::Int)
+  @set_preferences!("parBreakEvenWring"=>beWring)
+  @set_preferences!("parBreakEvenTwistree"=>beTwistree)
+end
 
 function nRounds(len::Integer)
   ret=3
