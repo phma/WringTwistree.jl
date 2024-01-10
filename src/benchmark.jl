@@ -6,6 +6,29 @@ text59049 = map(WringTwistree.xorn,collect(1:59049))
 
 hash!(twistree96,text59049);
 
+function xIntercept(lr::LinearRegression.LinearRegressor)
+  -LinearRegression.bias(lr)/LinearRegression.slope(lr)[1]
+end
+
+function isReady(logRatios::Vector{<:Real})
+  ready=true
+  pos=false
+  neg=false
+  lim=0.05*√length(logRatios)
+  for ratio in logRatios
+    if abs(ratio)>lim
+      ready=false
+    end
+    if ratio>0
+      pos=true
+    end
+    if ratio<0
+      neg=true
+    end
+  end
+  pos && neg && ready
+end
+
 function twistreeTime(n::Integer) # in nanoseconds
   textn=map(WringTwistree.xorn,collect(1:n))
   trial=@benchmark hash!(twistree96,$textn)
@@ -74,10 +97,6 @@ function wringBreakEven0()
   midLength
 end
 
-function xIntercept(lr::LinearRegression.LinearRegressor)
-  -LinearRegression.bias(lr)/LinearRegression.slope(lr)[1]
-end
-
 function wringBreakEven()
   lengths=Int[]
   logRatios=Float64[]
@@ -91,13 +110,13 @@ function wringBreakEven()
   push!(lengths,65536)
   push!(logRatios,log(wringTimeRatio(65536)))
   println("Length=",lengths[2]," Ratio=",exp(logRatios[2]))
-  while abs(xint-lastXint)>5 || abs(last2Xint-lastXint)>5 || abs(xint-last2Xint)>5
+  while i<5 || abs(last(logRatios))>0.05 || !isReady(logRatios)
     lr=linregress(lengths,logRatios)
     last2Xint=lastXint
     lastXint=xint
     xint=xIntercept(lr)
     if xint<=0
-      xint=round(Int,lastXint*2/3)
+      xint=lastXint*2/3
     end
     push!(lengths,round(Int,xint))
     push!(logRatios,log(wringTimeRatio(round(Int,xint))))
@@ -108,7 +127,7 @@ function wringBreakEven()
     println("Length=",last(lengths)," Ratio=",exp(last(logRatios)))
     i+=1
   end
-  xint
+  round(Int,xint)
 end
 
 """
