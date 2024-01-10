@@ -53,7 +53,7 @@ function wringTimeRatio(n::Integer)
   median(trialSeq).time/median(trialPar).time
 end
 
-function wringBreakEven()
+function wringBreakEven0()
   minLength=1
   minRatio=wringTimeRatio(minLength) # <1
   maxLength=100000
@@ -72,6 +72,43 @@ function wringBreakEven()
     end
   end
   midLength
+end
+
+function xIntercept(lr::LinearRegression.LinearRegressor)
+  -LinearRegression.bias(lr)/LinearRegression.slope(lr)[1]
+end
+
+function wringBreakEven()
+  lengths=Int[]
+  logRatios=Float64[]
+  i=0
+  xint=-1.0
+  lastXint=1e3
+  last2Xint=1e6
+  push!(lengths,256)
+  push!(logRatios,log(wringTimeRatio(256)))
+  println("Length=",lengths[1]," Ratio=",exp(logRatios[1]))
+  push!(lengths,65536)
+  push!(logRatios,log(wringTimeRatio(65536)))
+  println("Length=",lengths[2]," Ratio=",exp(logRatios[2]))
+  while abs(xint-lastXint)>5 || abs(last2Xint-lastXint)>5 || abs(xint-last2Xint)>5
+    lr=linregress(lengths,logRatios)
+    last2Xint=lastXint
+    lastXint=xint
+    xint=xIntercept(lr)
+    if xint<=0
+      xint=round(Int,lastXint*2/3)
+    end
+    push!(lengths,round(Int,xint))
+    push!(logRatios,log(wringTimeRatio(round(Int,xint))))
+    if isodd(i)
+      deleteat!(lengths,1)
+      deleteat!(logRatios,1)
+    end
+    println("Length=",last(lengths)," Ratio=",exp(last(logRatios)))
+    i+=1
+  end
+  xint
 end
 
 """
