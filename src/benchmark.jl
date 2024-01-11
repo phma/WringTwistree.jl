@@ -71,7 +71,7 @@ function twistreeBreakEven()
   push!(logRatios,log(twistreeTimeRatio(65536)))
   println("Length=",lengths[2]," Ratio=",exp(logRatios[2]))
   while (i<5 || abs(last(logRatios))>0.05 || !isReady(logRatios)) &&
-	(i<3 || !oneThread(logRatios))
+	(i<3 || xint<524288 || !oneThread(logRatios))
     lr=linregress(lengths,logRatios)
     last2Xint=lastXint
     lastXint=xint
@@ -122,7 +122,7 @@ function wringBreakEven()
   push!(logRatios,log(wringTimeRatio(65536)))
   println("Length=",lengths[2]," Ratio=",exp(logRatios[2]))
   while (i<5 || abs(last(logRatios))>0.05 || !isReady(logRatios)) &&
-	(i<3 || !oneThread(logRatios))
+	(i<3 || xint<524288 || !oneThread(logRatios))
     lr=linregress(lengths,logRatios)
     last2Xint=lastXint
     lastXint=xint
