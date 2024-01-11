@@ -58,24 +58,41 @@ function twistreeTimeRatio(n::Integer)
 end
 
 function twistreeBreakEven()
-  minLength=1
-  minRatio=twistreeTimeRatio(minLength) # <1
-  maxLength=100000
-  maxRatio=twistreeTimeRatio(maxLength) # >1
-  midLength=0
-  while maxLength-minLength>1
-    midLength=(minLength+maxLength)÷2
-    midRatio=twistreeTimeRatio(midLength)
-    println("Length=",midLength," Ratio=",midRatio)
-    if midRatio>1
-      maxLength=midLength
-      maxRatio=midRatio
-    else
-      minLength=midLength
-      minRatio=midRatio
+  lengths=Int[]
+  logRatios=Float64[]
+  i=0
+  xint=-1.0
+  lastXint=1e3
+  last2Xint=1e6
+  push!(lengths,256)
+  push!(logRatios,log(twistreeTimeRatio(256)))
+  println("Length=",lengths[1]," Ratio=",exp(logRatios[1]))
+  push!(lengths,65536)
+  push!(logRatios,log(twistreeTimeRatio(65536)))
+  println("Length=",lengths[2]," Ratio=",exp(logRatios[2]))
+  while (i<5 || abs(last(logRatios))>0.05 || !isReady(logRatios)) &&
+	(i<3 || !oneThread(logRatios))
+    lr=linregress(lengths,logRatios)
+    last2Xint=lastXint
+    lastXint=xint
+    xint=xIntercept(lr)
+    if xint<=0
+      xint=lastXint*2/3
     end
+    push!(lengths,round(Int,xint))
+    push!(logRatios,log(twistreeTimeRatio(round(Int,xint))))
+    if isodd(i)
+      deleteat!(lengths,1)
+      deleteat!(logRatios,1)
+    end
+    println("Length=",last(lengths)," Ratio=",exp(last(logRatios)))
+    i+=1
   end
-  midLength
+  if oneThread(logRatios)
+    typemax(Int)
+  else
+    round(Int,xint)
+  end
 end
 
 function wringTime(n::Integer) # in nanoseconds
@@ -89,27 +106,6 @@ function wringTimeRatio(n::Integer)
   trialSeq=@benchmark encrypt!(wring96,$textn,:sequential)
   trialPar=@benchmark decrypt!(wring96,$textn,:parallel)
   median(trialSeq).time/median(trialPar).time
-end
-
-function wringBreakEven0()
-  minLength=1
-  minRatio=wringTimeRatio(minLength) # <1
-  maxLength=100000
-  maxRatio=wringTimeRatio(maxLength) # >1
-  midLength=0
-  while maxLength-minLength>1
-    midLength=(minLength+maxLength)÷2
-    midRatio=wringTimeRatio(midLength)
-    println("Length=",midLength," Ratio=",midRatio)
-    if midRatio>1
-      maxLength=midLength
-      maxRatio=midRatio
-    else
-      minLength=midLength
-      minRatio=midRatio
-    end
-  end
-  midLength
 end
 
 function wringBreakEven()
