@@ -29,6 +29,21 @@ function isReady(logRatios::Vector{<:Real})
   pos && neg && ready
 end
 
+function oneThread(logRatios::Vector{<:Real})
+  # If there's only one thread, all the logRatios are negative.
+  pos=false
+  neg=false
+  for ratio in logRatios
+    if ratio>0
+      pos=true
+    end
+    if ratio<0
+      neg=true
+    end
+  end
+  !pos && neg
+end
+
 function twistreeTime(n::Integer) # in nanoseconds
   textn=map(WringTwistree.xorn,collect(1:n))
   trial=@benchmark hash!(twistree96,$textn)
@@ -110,7 +125,8 @@ function wringBreakEven()
   push!(lengths,65536)
   push!(logRatios,log(wringTimeRatio(65536)))
   println("Length=",lengths[2]," Ratio=",exp(logRatios[2]))
-  while i<5 || abs(last(logRatios))>0.05 || !isReady(logRatios)
+  while (i<5 || abs(last(logRatios))>0.05 || !isReady(logRatios)) &&
+	(i<3 || !oneThread(logRatios))
     lr=linregress(lengths,logRatios)
     last2Xint=lastXint
     lastXint=xint
@@ -127,7 +143,11 @@ function wringBreakEven()
     println("Length=",last(lengths)," Ratio=",exp(last(logRatios)))
     i+=1
   end
-  round(Int,xint)
+  if oneThread(logRatios)
+    typemax(Int)
+  else
+    round(Int,xint)
+  end
 end
 
 """
