@@ -20,5 +20,7 @@ This is a Julia implementation. The reference implementations, in Rust and Haske
 
 In the project directory, run `julia --project` at the shell prompt, then in Julia run `using WringTwistree`. You probably want `export JULIA_NUM_THREADS=auto` in your `.profile`, as the algorithms run faster on big inputs when multithreaded. You can then create a Wring, a Twistree, and some byte vectors and encrypt and hash them.
 
+Before encrypting, decrypting, or hashing, and after upgrading Julia, run `setBreakEven()`. This sets the break-even points for Wring and Twistree. When given more data than the break-even points, the functions will handle them in parallel.
+
 # Test vectors
 Test vectors are in `test/runtests.jl`. To run them, type `]` to enter Pkg mode, then `test`.
