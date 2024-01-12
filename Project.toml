@@ -2,6 +2,7 @@ name = "WringTwistree"
 uuid = "b97f57d3-c4d5-419f-b8d9-90964b0843a1"
 authors = ["Pierre Abbat <phma@bezitopo.org>"]
 version = "0.1.0"
+description = "Whole-message cipher and tree hash"
 
 [deps]
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
