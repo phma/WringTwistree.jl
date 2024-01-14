@@ -14,3 +14,15 @@ Preferences = "21216c6a-2e73-6563-6e65-726566657250"
 Primes = "27ebfcd6-29c5-5fa9-bf4b-fb8fc14df3ae"
 ProfileView = "c46f51b8-102a-5cf2-8d2c-8597cb0e0da7"
 Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
+
+[compat]
+julia = "1.9"
+BenchmarkTools = "1.4.0"
+Debugger = "0.7.8"
+LinearRegression = "0.2.1"
+Mods = "1.3.3, 2.1" # 1.3.4 is good, but 2.0.0 is buggy.
+OffsetArrays = "1.13.0"
+Preferences = "1.4.1"
+Primes = "0.5.5"
+ProfileView = "1.7.2"
+Revise = "3.5.13"
