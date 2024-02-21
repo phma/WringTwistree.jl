@@ -34,6 +34,7 @@ function rotBitcountSeq!(src::Vector{UInt8},dst::Vector{UInt8},mult::Integer)
   for i in byte+2:len
     @inbounds dst[i]=(src[i-byte]<<bit) | (src[i-byte-1]>>(8-bit))
   end
+  bitcount
 end
 
 function rotBitcountPar!(src::Vector{UInt8},dst::Vector{UInt8},mult::Integer)
@@ -59,6 +60,7 @@ function rotBitcountPar!(src::Vector{UInt8},dst::Vector{UInt8},mult::Integer)
     @inbounds dst[i]=(src[(i+len-byte-1)%len+1]<<bit) |
 		     (src[(i+len-byte-2)%len+1]>>(8-bit))
   end
+  bitcount
 end
 
 """

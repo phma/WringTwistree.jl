@@ -80,10 +80,11 @@ function roundEncryptSeq(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
   for i in eachindex(src)
     @inbounds src[i]=wring.sbox[src[i],(rond+i-1)%3]
   end
-  rotBitcountSeq!(src,dst,1)
+  rot=rotBitcountSeq!(src,dst,1)
   for i in eachindex(dst)
     @inbounds dst[i]+=xorn((i-1)⊻rond)
   end
+  rot
 end
 
 function roundDecryptSeq(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
@@ -104,10 +105,11 @@ function roundEncryptPar(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
   @threads for i in eachindex(src)
     @inbounds src[i]=wring.sbox[src[i],(rond+i-1)%3]
   end
-  rotBitcountPar!(src,dst,1)
+  rot=rotBitcountPar!(src,dst,1)
   @threads for i in eachindex(dst)
     @inbounds dst[i]+=xorn((i-1)⊻rond)
   end
+  rot
 end
 
 function roundDecryptPar(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
@@ -139,6 +141,26 @@ function encryptSeq!(wring::Wring,buf::Vector{UInt8})
       @inbounds buf[i]=tmp[i]
     end
   end
+end
+
+function encryptSeqN!(wring::Wring,nrond::Integer,buf::Vector{UInt8})
+# Puts ciphertext back into buf. Returns list of bitcounts.
+  tmp=copy(buf)
+  rots=Int[]
+  rprime=length(buf)<3 ? 1 : findMaxOrder(length(buf)÷3)
+  for i in 0:nrond-1
+    if (i&1)==0
+      push!(rots,roundEncryptSeq(wring,buf,tmp,rprime,i))
+    else
+      push!(rots,roundEncryptSeq(wring,tmp,buf,rprime,i))
+    end
+  end
+  if (nrond&1)>0
+    for i in eachindex(tmp)
+      @inbounds buf[i]=tmp[i]
+    end
+  end
+  rots
 end
 
 function decryptSeq!(wring::Wring,buf::Vector{UInt8})
@@ -179,6 +201,26 @@ function encryptPar!(wring::Wring,buf::Vector{UInt8})
   end
 end
 
+function encryptParN!(wring::Wring,nrond::Integer,buf::Vector{UInt8})
+# Puts ciphertext back into buf. Returns list of bitcounts.
+  tmp=copy(buf)
+  rots=Int[]
+  rprime=length(buf)<3 ? 1 : findMaxOrder(length(buf)÷3)
+  for i in 0:nrond-1
+    if (i&1)==0
+      push!(rots,roundEncryptPar(wring,buf,tmp,rprime,i))
+    else
+      push!(rots,roundEncryptPar(wring,tmp,buf,rprime,i))
+    end
+  end
+  if (nrond&1)>0
+    @threads for i in eachindex(tmp)
+      @inbounds buf[i]=tmp[i]
+    end
+  end
+  rots
+end
+
 function decryptPar!(wring::Wring,buf::Vector{UInt8})
 # Puts plaintext back into buf.
   tmp=copy(buf)
@@ -210,6 +252,21 @@ function encrypt!(wring::Wring,buf::Vector{UInt8},parseq::Symbol=:default)
     encryptPar!(wring,buf)
   else
     encryptSeq!(wring,buf)
+  end
+end
+
+function encryptN!(wring::Wring,nrond::Integer,buf::Vector{UInt8},parseq::Symbol=:default)
+  if parseq==:default
+    if length(buf)>=parBreakEvenWring
+      parseq=:parallel
+    else
+      parseq=:sequential
+    end
+  end
+  if parseq==:parallel
+    encryptParN!(wring,nrond,buf)
+  else
+    encryptSeqN!(wring,nrond,buf)
   end
 end
 
