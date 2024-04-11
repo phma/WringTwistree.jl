@@ -6,7 +6,7 @@ include("Compress.jl")
 include("Blockize.jl")
 using OffsetArrays,Base.Threads,BenchmarkTools,Preferences,LinearRegression
 using .Mix3,.RotBitcount,.Sboxes,.Compress,.Blockize
-export carmichael
+export carmichael,Wring,Twistree
 export keyedWring,encryptSeq!,decryptSeq!,encryptPar!,decryptPar!,encrypt!,decrypt!
 export keyedTwistree,initialize!,update!,finalize!,hash!,cycleRotBitcount
 export setBreakEven # in benchmark
