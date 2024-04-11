@@ -74,6 +74,8 @@ function keyedWring(key)
   Wring(sbox,invSbox)
 end
 
+const linearWring=Wring(linearSbox(),linearInvSbox()) # for cryptanalysis
+
 function roundEncryptSeq(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
 		      rprime::Integer,rond::Integer)
   mix3PartsSeq!(src,rprime) # this clobbers src
