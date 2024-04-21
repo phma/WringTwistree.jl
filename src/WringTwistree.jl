@@ -43,6 +43,15 @@ function xorn(n::Integer)
   ret
 end
 
+function countDiff(a::Vector{<:Number},b::Vector{<:Number})
+  ret=0
+  @assert length(a)==length(b) "countDiff: size mismatch"
+  for i in eachindex(a)
+    ret+=a[i]!=b[i]
+  end
+  ret
+end
+
 struct Wring
   sbox    ::OffsetArray{UInt8}
   invSbox ::OffsetArray{UInt8}
