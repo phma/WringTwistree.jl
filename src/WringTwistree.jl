@@ -174,6 +174,36 @@ function encryptSeqN!(wring::Wring,nrond::Integer,buf::Vector{UInt8})
   rots
 end
 
+function encryptSeqN2!(wring::Wring,nrond::Integer,
+		       buf0::Vector{UInt8},buf1::Vector{UInt8})
+# Puts ciphertext back into buf0 and buf1.
+# Returns list of numbers of different bytes.
+  tmp0=copy(buf0)
+  tmp1=copy(buf1)
+  diffs=Int[]
+  rprime=length(buf0)<3 ? 1 : findMaxOrder(length(buf0)÷3)
+  for i in 0:nrond-1
+    if (i&1)==0
+      roundEncryptSeq(wring,buf0,tmp0,rprime,i)
+      roundEncryptSeq(wring,buf1,tmp1,rprime,i)
+      push!(diffs,countDiff(tmp0,tmp1))
+    else
+      roundEncryptSeq(wring,tmp0,buf0,rprime,i)
+      roundEncryptSeq(wring,tmp1,buf1,rprime,i)
+      push!(diffs,countDiff(buf0,buf1))
+    end
+  end
+  if (nrond&1)>0
+    for i in eachindex(tmp0)
+      @inbounds buf0[i]=tmp0[i]
+    end
+    for i in eachindex(tmp1)
+      @inbounds buf1[i]=tmp1[i]
+    end
+  end
+  diffs
+end
+
 function decryptSeq!(wring::Wring,buf::Vector{UInt8})
 # Puts plaintext back into buf.
   tmp=copy(buf)
