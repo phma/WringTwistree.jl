@@ -262,6 +262,34 @@ function encryptParN!(wring::Wring,nrond::Integer,buf::Vector{UInt8})
   rots
 end
 
+function encryptParN2!(wring::Wring,nrond::Integer,
+		       buf0::Vector{UInt8},buf1::Vector{UInt8})
+# Puts ciphertext back into buf0 and buf1.
+# Returns list of numbers of different bytes.
+  tmp0=copy(buf0)
+  tmp1=copy(buf1)
+  diffs=Int[]
+  rprime=length(buf0)<3 ? 1 : findMaxOrder(length(buf0)÷3)
+  for i in 0:nrond-1
+    if (i&1)==0
+      roundEncryptPar(wring,buf0,tmp0,rprime,i)
+      roundEncryptPar(wring,buf1,tmp1,rprime,i)
+      push!(diffs,countDiff(tmp0,tmp1))
+    else
+      roundEncryptPar(wring,tmp0,buf0,rprime,i)
+      roundEncryptPar(wring,tmp1,buf1,rprime,i)
+      push!(diffs,countDiff(buf0,buf1))
+    end
+  end
+  if (nrond&1)>0
+    @threads for i in eachindex(tmp0)
+      @inbounds buf0[i]=tmp0[i]
+      @inbounds buf1[i]=tmp1[i]
+    end
+  end
+  diffs
+end
+
 function decryptPar!(wring::Wring,buf::Vector{UInt8})
 # Puts plaintext back into buf.
   tmp=copy(buf)
