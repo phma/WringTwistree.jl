@@ -339,6 +339,23 @@ function encryptN!(wring::Wring,nrond::Integer,buf::Vector{UInt8},parseq::Symbol
   end
 end
 
+function encryptN2!(wring::Wring,nrond::Integer,buf0::Vector{UInt8},
+		    buf1::Vector{UInt8},parseq::Symbol=:default)
+  @assert length(buf0)==length(buf1)
+  if parseq==:default
+    if length(buf0)>=parBreakEvenWring
+      parseq=:parallel
+    else
+      parseq=:sequential
+    end
+  end
+  if parseq==:parallel
+    encryptParN2!(wring,nrond,buf0,buf1)
+  else
+    encryptSeqN2!(wring,nrond,buf0,buf1)
+  end
+end
+
 function decrypt!(wring::Wring,buf::Vector{UInt8},parseq::Symbol=:default)
   if parseq==:default
     if length(buf)>parBreakEvenWring
