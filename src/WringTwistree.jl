@@ -27,8 +27,8 @@ end
 
 function nRounds(len::Integer)
   ret=3
-  while len>=3
-    len÷=3
+  while len>=2
+    len÷=2
     ret+=1
   end
   ret
