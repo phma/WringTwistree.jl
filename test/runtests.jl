@@ -20,7 +20,7 @@ twistree6 = keyedTwistree(key6)
 twistree0 = keyedTwistree("")
 text59049 = map(WringTwistree.xorn,collect(1:59049))
 
-function testVectorWring(wring,plaintext,ciphertext)
+function testVectorWring(wring::Wring,plaintext,ciphertext::Vector{UInt8})
   plaintext=Vector{UInt8}(plaintext)
   text=copy(plaintext)
   encrypt!(wring,text)
@@ -33,7 +33,7 @@ function testVectorWring(wring,plaintext,ciphertext)
   ret
 end
 
-function testVectorTwistree(twistree,plaintext,hashtext)
+function testVectorTwistree(twistree::Twistree,plaintext,hashtext::Vector{UInt8})
   plaintext=Vector{UInt8}(plaintext)
   initialize!(twistree)
   update!(twistree,plaintext)
@@ -45,7 +45,7 @@ function testVectorTwistree(twistree,plaintext,hashtext)
   ret
 end
 
-function testParallelWring(wring,plaintext)
+function testParallelWring(wring::Wring,plaintext)
   plaintext=Vector{UInt8}(plaintext)
   text=copy(plaintext)
   encryptSeq!(wring,text)
