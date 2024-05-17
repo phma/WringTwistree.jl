@@ -55,6 +55,7 @@ end
 struct Wring
   sbox    ::OffsetArray{UInt8}
   invSbox ::OffsetArray{UInt8}
+  яхид	  ::Яхид
 end
 
 """
@@ -80,10 +81,10 @@ WringTwistree.Wring(UInt8[0x59 0xe9 0xe7; 0xdb 0x13 0x00; … ;
 function keyedWring(key)
   sbox=sboxes(key)
   invSbox=inverse(sbox)
-  Wring(sbox,invSbox)
+  Wring(sbox,invSbox,Яхид())
 end
 
-const linearWring=Wring(linearSbox(),linearInvSbox()) # for cryptanalysis
+const linearWring=Wring(linearSbox(),linearInvSbox(),Яхид()) # for cryptanalysis
 
 function roundEncryptSeq(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
 		      rprime::Integer,rond::Integer)
@@ -379,6 +380,7 @@ mutable struct Twistree
   tree2		::Vector{Vector{UInt8}}
   tree3		::Vector{Vector{UInt8}}
   partialBlock	::Vector{UInt8}
+  яхид		::Яхид
 end
 
 """
@@ -405,7 +407,7 @@ function keyedTwistree(key)
   tree2=Vector{UInt8}[]
   tree3=Vector{UInt8}[]
   partialBlock=UInt8[]
-  Twistree(sbox,tree2,tree3,partialBlock)
+  Twistree(sbox,tree2,tree3,partialBlock,Яхид())
 end
 
 """

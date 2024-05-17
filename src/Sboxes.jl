@@ -3,7 +3,10 @@ include("Permute.jl")
 include("KeySchedule.jl")
 using OffsetArrays
 using .KeySchedule,.Permute
-export sboxes,linearSbox,linearInvSbox,inverse
+export sboxes,linearSbox,linearInvSbox,inverse,Яхид
+
+struct Яхид # Hebrew יחיד (singleton) transliterated to Cyrillic
+end	    # so that it can be capitalized
 
 function sboxes(key::Vector{UInt8})
   sbox=OffsetArray(zeros(UInt8,256,3),0:255,0:2)
