@@ -1,4 +1,4 @@
-using WringTwistree,Test,OffsetArrays
+using WringTwistree,Test
 
 @test WringTwistree.findMaxOrder(85)==54
 @test WringTwistree.findMaxOrder(1618034)==1000001
@@ -19,13 +19,6 @@ twistree30 = keyedTwistree(key30)
 twistree6 = keyedTwistree(key6)
 twistree0 = keyedTwistree("")
 text59049 = map(WringTwistree.xorn,collect(1:59049))
-
-# Temporary test of information hiding
-# Trying to use these fakes will fail, because the matrices are transposed.
-fakeWring=Wring(OffsetArray(zeros(UInt8,3,256),0:2,0:255),
-		OffsetArray(zeros(UInt8,3,256),0:2,0:255))
-fakeTwistree=Twistree(OffsetArray(zeros(UInt8,3,256),0:2,0:255),
-		      Vector{UInt8}[],Vector{UInt8}[],UInt8[])
 
 function testVectorWring(wring,plaintext,ciphertext)
   plaintext=Vector{UInt8}(plaintext)
