@@ -11,6 +11,7 @@ and this project adheres to the [Semantic Versioning](https://semver.org/).
 
 - Non-exported functions for cryptanalysis
 - Exported structs Wring and Twistree
+- Keeping users from creating invalid Wring or Twistree
 
 ### Changed
 
