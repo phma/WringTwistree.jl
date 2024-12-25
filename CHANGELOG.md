@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to the [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+### Changed
+
+- Fixed bug that threw an error with a one-byte key
+
 ## 1.0.0 - 2024-05-31
 
 ### Added

@@ -12,7 +12,7 @@ function extendKey(str::Vector{UInt8})
   end
   for i in 0:n-1
     for j in str
-      push!(ret,256*i+j)
+      push!(ret,(256*i+j)&0xffff)
     end
   end
   ret
