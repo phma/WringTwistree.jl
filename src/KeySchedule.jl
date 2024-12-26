@@ -46,6 +46,8 @@ end
 function reschedule!(subkey::OffsetArray{UInt16})
   for i in 0:95
     alter!(subkey,40504,i)
+    # 40505 is the closest primitive root to 65537/φ.
+    # It appears as 40504 because of the 1-offset in mul65537.
   end
 end
 
