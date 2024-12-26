@@ -1,3 +1,8 @@
+"""
+  WringTwistree
+
+This module provides the Wring whole-message cipher and the Twistree hash function.
+"""
 module WringTwistree
 include("Mix3.jl")
 include("RotBitcount.jl")
@@ -52,6 +57,12 @@ function countDiff(a::Vector{<:Number},b::Vector{<:Number})
   ret
 end
 
+"""
+  struct Wring
+
+Contains the forward and inverse S-boxes of a Wring cipher.
+Generate with `keyedWring`.
+"""
 struct Wring
   sbox    ::OffsetArray{UInt8}
   invSbox ::OffsetArray{UInt8}
@@ -136,6 +147,11 @@ function roundDecryptPar(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
   mix3PartsPar!(dst,rprime)
 end
 
+"""
+  encryptSeq!(wring::Wring,buf::Vector{UInt8})
+
+Encrypt sequentially. See `encrypt!`.
+"""
 function encryptSeq!(wring::Wring,buf::Vector{UInt8})
 # Puts ciphertext back into buf.
   tmp=copy(buf)
@@ -205,6 +221,11 @@ function encryptSeqN2!(wring::Wring,nrond::Integer,
   diffs
 end
 
+"""
+  decryptSeq!(wring::Wring,buf::Vector{UInt8})
+
+Decrypt sequentially. See `decrypt!`.
+"""
 function decryptSeq!(wring::Wring,buf::Vector{UInt8})
 # Puts plaintext back into buf.
   tmp=copy(buf)
@@ -224,6 +245,11 @@ function decryptSeq!(wring::Wring,buf::Vector{UInt8})
   end
 end
 
+"""
+  encryptPar!(wring::Wring,buf::Vector{UInt8})
+
+Encrypt in parallel. See `encrypt!`.
+"""
 function encryptPar!(wring::Wring,buf::Vector{UInt8})
 # Puts ciphertext back into buf.
   tmp=copy(buf)
@@ -291,6 +317,11 @@ function encryptParN2!(wring::Wring,nrond::Integer,
   diffs
 end
 
+"""
+  decryptPar!(wring::Wring,buf::Vector{UInt8})
+
+Decrypt in parallel. See `decrypt!`.
+"""
 function decryptPar!(wring::Wring,buf::Vector{UInt8})
 # Puts plaintext back into buf.
   tmp=copy(buf)
@@ -310,6 +341,14 @@ function decryptPar!(wring::Wring,buf::Vector{UInt8})
   end
 end
 
+"""
+  function encrypt!(wring::Wring,buf::Vector{UInt8},parseq::Symbol=:default)
+
+Encrypt `buf` in place using `wring` as the processed key. If `parseq` is:
+- `:sequential`, the encryption is sequential
+- `:parallel`, the encryption is parallel
+- `:default`, the encryption is serial for small `buf` and parallel for large `buf`.
+"""
 function encrypt!(wring::Wring,buf::Vector{UInt8},parseq::Symbol=:default)
   if parseq==:default
     if length(buf)>=parBreakEvenWring
@@ -357,6 +396,14 @@ function encryptN2!(wring::Wring,nrond::Integer,buf0::Vector{UInt8},
   end
 end
 
+"""
+  function decrypt!(wring::Wring,buf::Vector{UInt8},parseq::Symbol=:default)
+
+Decrypt `buf` in place using `wring` as the processed key. If `parseq` is:
+- `:sequential`, the decryption is sequential
+- `:parallel`, the decryption is parallel
+- `:default`, the decryption is serial for small `buf` and parallel for large `buf`.
+"""
 function decrypt!(wring::Wring,buf::Vector{UInt8},parseq::Symbol=:default)
   if parseq==:default
     if length(buf)>parBreakEvenWring
@@ -375,6 +422,12 @@ end
 #--------------------------------------------------------------
 # Twistree is a hash function.
 
+"""
+  mutable struct Twistree
+
+Contains the S-boxes and internal state of a Twistree hash.
+Generate with `keyedTwistree`.
+"""
 mutable struct Twistree
   sbox		::OffsetArray{UInt8}
   tree2		::Vector{Vector{UInt8}}
@@ -386,8 +439,8 @@ end
 """
     keyedTwistree(key)
 
-Create a Twistree which can be used to hash a Vector{UInt8}.
-The key can be a String or Vector{UInt8} and should be at longest 96 bytes.
+Create a `Twistree` which can be used to hash a `Vector{UInt8}`.
+The key can be a `String` or `Vector{UInt8}` and should be at longest 96 bytes.
 For an unkeyed hash, use an empty string.
 
 # Examples

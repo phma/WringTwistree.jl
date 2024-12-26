@@ -32,6 +32,11 @@ function searchDir(n::Integer)
   end
 end
 
+"""
+  carmichael(n::Integer)
+
+Compute the Carmichael function, the largest multiplicative order of any number mod n.
+"""
 function carmichael(n::Integer)
   facs=factor(n)
   ret=one(n)
