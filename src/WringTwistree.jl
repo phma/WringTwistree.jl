@@ -22,12 +22,14 @@ export setBreakEven # in benchmark
 #--------------------------------------------------------------
 # Wring is a whole-message cipher.
 
-const parBreakEvenWring::Int=@load_preference("parBreakEvenWring",typemax(Int))
-const parBreakEvenTwistree::Int=@load_preference("parBreakEvenTwistree",typemax(Int))
+parBreakEvenWring::Int=@load_preference("parBreakEvenWring",typemax(Int))
+parBreakEvenTwistree::Int=@load_preference("parBreakEvenTwistree",typemax(Int))
 
 function setBreakEven2(beWring::Int,beTwistree::Int)
   @set_preferences!("parBreakEvenWring"=>beWring)
   @set_preferences!("parBreakEvenTwistree"=>beTwistree)
+  parBreakEvenWring=beWring
+  parBreakEvenTwistree=beTwistree
 end
 
 function nRounds(len::Integer)
