@@ -148,12 +148,15 @@ end
 
 """
     setBreakEven()
+    setBreakEven(beWring::Int,beTwistree::Int)
 
 Compute and set the break-even points for parallel Wring and Twistree.
 Run this when upgrading Julia or installing on a new computer.
-It takes several minutes.
+With no arguments, computing the break-even points takes several minutes.
+
+`beWring` is in bytes, but `beTwistree` is in 32-byte hash blocks. They are
+stored in `LocalPreferences.toml`.
 """
 function setBreakEven()
-  setBreakEven2(wringBreakEven(),twistreeBreakEven()÷32)
-  @info("Restart Julia for the break-evens to take effect")
+  setBreakEven(wringBreakEven(),twistreeBreakEven()÷32)
 end

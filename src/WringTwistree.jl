@@ -25,11 +25,12 @@ export setBreakEven # in benchmark
 parBreakEvenWring::Int=@load_preference("parBreakEvenWring",typemax(Int))
 parBreakEvenTwistree::Int=@load_preference("parBreakEvenTwistree",typemax(Int))
 
-function setBreakEven2(beWring::Int,beTwistree::Int)
+function setBreakEven(beWring::Int,beTwistree::Int)
   @set_preferences!("parBreakEvenWring"=>beWring)
   @set_preferences!("parBreakEvenTwistree"=>beTwistree)
   parBreakEvenWring=beWring
   parBreakEvenTwistree=beTwistree
+  return nothing
 end
 
 function nRounds(len::Integer)
