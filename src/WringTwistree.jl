@@ -13,8 +13,8 @@ using OffsetArrays,Base.Threads,BenchmarkTools,Preferences,LinearRegression
 using .Mix3,.RotBitcount,.Sboxes,.Compress,.Blockize
 export carmichael,Wring,Twistree
 export keyedWring,encryptSeq!,decryptSeq!,encryptPar!,decryptPar!,encrypt!,decrypt!
-export keyedTwistree,initialize!,update!,finalize!,hash!,cycleRotBitcount
-export setBreakEven # in benchmark
+export keyedTwistree,initialize!,update!,finalize!,hash!
+export setBreakEven # in benchmark and here
 # carmichael is exported in case someone wants the Carmichael function,
 # which I couldn't find.
 # findMaxOrder is needed for test.

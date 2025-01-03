@@ -1,4 +1,5 @@
 using WringTwistree,Test
+import WringTwistree.cycleRotBitcount
 
 @test WringTwistree.findMaxOrder(85)==54
 @test WringTwistree.findMaxOrder(1618034)==1000001
