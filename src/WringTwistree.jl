@@ -12,7 +12,7 @@ include("Blockize.jl")
 using OffsetArrays,Base.Threads,BenchmarkTools,Preferences,LinearRegression
 using .Mix3,.RotBitcount,.Sboxes,.Compress,.Blockize
 export carmichael,Wring,Twistree
-export keyedWring,encryptSeq!,decryptSeq!,encryptPar!,decryptPar!,encrypt!,decrypt!
+export keyedWring,encrypt!,decrypt!
 export keyedTwistree,initialize!,update!,finalize!,hash!
 export setBreakEven # in benchmark and here
 # carmichael is exported in case someone wants the Carmichael function,

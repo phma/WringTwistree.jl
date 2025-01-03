@@ -49,8 +49,8 @@ end
 function testParallelWring(wring::Wring,plaintext)
   plaintext=Vector{UInt8}(plaintext)
   text=copy(plaintext)
-  encryptSeq!(wring,text)
-  decryptPar!(wring,text)
+  encrypt!(wring,text,:sequential)
+  decrypt!(wring,text,:parallel)
   ret=text==plaintext
   ret
 end
