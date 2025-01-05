@@ -66,6 +66,7 @@ end
 """
     cycleRotBitcount(buf::Vector{UInt8})
 
+Use this function ONLY in test code!
 Repeatedly runs `rotBitcount` on `buf` until it repeats. The return value is (a,b),
 where a-b is the cycle length. If b>0, there's a bug.
 """

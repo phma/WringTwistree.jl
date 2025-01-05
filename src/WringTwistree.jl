@@ -153,7 +153,7 @@ end
 """
     encryptSeq!(wring::Wring,buf::Vector{UInt8})
 
-Encrypt sequentially. See `encrypt!`.
+Encrypt sequentially. Use `encrypt!(wring,buf,:sequential)` instead.
 """
 function encryptSeq!(wring::Wring,buf::Vector{UInt8})
 # Puts ciphertext back into buf.
@@ -227,7 +227,7 @@ end
 """
     decryptSeq!(wring::Wring,buf::Vector{UInt8})
 
-Decrypt sequentially. See `decrypt!`.
+Decrypt sequentially. Use `decrypt!(wring,buf,:sequential)` instead.
 """
 function decryptSeq!(wring::Wring,buf::Vector{UInt8})
 # Puts plaintext back into buf.
@@ -251,7 +251,7 @@ end
 """
     encryptPar!(wring::Wring,buf::Vector{UInt8})
 
-Encrypt in parallel. See `encrypt!`.
+Encrypt in parallel. Use `encrypt!(wring,buf,:parallel)` instead.
 """
 function encryptPar!(wring::Wring,buf::Vector{UInt8})
 # Puts ciphertext back into buf.
@@ -323,7 +323,7 @@ end
 """
     decryptPar!(wring::Wring,buf::Vector{UInt8})
 
-Decrypt in parallel. See `decrypt!`.
+Decrypt in parallel. Use `decrypt!(wring,buf,:parallel)` instead.
 """
 function decryptPar!(wring::Wring,buf::Vector{UInt8})
 # Puts plaintext back into buf.
