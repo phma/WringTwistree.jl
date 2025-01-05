@@ -8,6 +8,18 @@ export ℯ⁴_2adic,ℯ⁴_base2,blockize!,pad!
 # blocks being hashed, so that if the message is only one block,
 # two different compressed blocks are combined at the end.
 
+#=
+julia> using Nemo
+
+julia> B=padic_field(2,precision=288)
+Field of 2-adic numbers
+
+julia> exp(B(4))
+2^0 + 2^2 + 2^3 + 2^6 + 2^8 + 2^14 + ... + 2^242 + 2^244 + 2^248 + 2^251 + ...
+
+2^0 + 2^2 + 2^3 + 2^6 + 2^8 + 2^14 = 0x414d
+2^242 + 2^244 + 2^248 + 2^251 = 0x0914*2^240
+=#
 const ℯ⁴_2adic=
   [ 0x4d, 0x41, 0x8e, 0x38, 0x72, 0x1a, 0x3a, 0xeb
   , 0x18, 0xe0, 0x08, 0x7f, 0xa3, 0x7f, 0x9c, 0xe0
