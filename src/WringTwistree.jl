@@ -1,5 +1,5 @@
 """
-  WringTwistree
+    WringTwistree
 
 This module provides the Wring whole-message cipher and the Twistree hash function.
 """
@@ -61,7 +61,7 @@ function countDiff(a::Vector{<:Number},b::Vector{<:Number})
 end
 
 """
-  struct Wring
+    struct Wring
 
 Contains the forward and inverse S-boxes of a Wring cipher.
 Generate with `keyedWring`.
@@ -151,7 +151,7 @@ function roundDecryptPar(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
 end
 
 """
-  encryptSeq!(wring::Wring,buf::Vector{UInt8})
+    encryptSeq!(wring::Wring,buf::Vector{UInt8})
 
 Encrypt sequentially. See `encrypt!`.
 """
@@ -225,7 +225,7 @@ function encryptSeqN2!(wring::Wring,nrond::Integer,
 end
 
 """
-  decryptSeq!(wring::Wring,buf::Vector{UInt8})
+    decryptSeq!(wring::Wring,buf::Vector{UInt8})
 
 Decrypt sequentially. See `decrypt!`.
 """
@@ -249,7 +249,7 @@ function decryptSeq!(wring::Wring,buf::Vector{UInt8})
 end
 
 """
-  encryptPar!(wring::Wring,buf::Vector{UInt8})
+    encryptPar!(wring::Wring,buf::Vector{UInt8})
 
 Encrypt in parallel. See `encrypt!`.
 """
@@ -321,7 +321,7 @@ function encryptParN2!(wring::Wring,nrond::Integer,
 end
 
 """
-  decryptPar!(wring::Wring,buf::Vector{UInt8})
+    decryptPar!(wring::Wring,buf::Vector{UInt8})
 
 Decrypt in parallel. See `decrypt!`.
 """
@@ -345,7 +345,7 @@ function decryptPar!(wring::Wring,buf::Vector{UInt8})
 end
 
 """
-  function encrypt!(wring::Wring,buf::Vector{UInt8},parseq::Symbol=:default)
+    encrypt!(wring::Wring,buf::Vector{UInt8},parseq::Symbol=:default)
 
 Encrypt `buf` in place using `wring` as the processed key. If `parseq` is:
 - `:sequential`, the encryption is sequential
@@ -400,7 +400,7 @@ function encryptN2!(wring::Wring,nrond::Integer,buf0::Vector{UInt8},
 end
 
 """
-  function decrypt!(wring::Wring,buf::Vector{UInt8},parseq::Symbol=:default)
+    decrypt!(wring::Wring,buf::Vector{UInt8},parseq::Symbol=:default)
 
 Decrypt `buf` in place using `wring` as the processed key. If `parseq` is:
 - `:sequential`, the decryption is sequential
@@ -426,7 +426,7 @@ end
 # Twistree is a hash function.
 
 """
-  mutable struct Twistree
+    mutable struct Twistree
 
 Contains the S-boxes and internal state of a Twistree hash.
 Generate with `keyedTwistree`.
