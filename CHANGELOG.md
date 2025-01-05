@@ -7,9 +7,19 @@ and this project adheres to the [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+### Added
+
+- Documentation of exported functions and structs
+- Method for setting parallel/serial thresholds to predetermined values
+
 ### Changed
 
 - Fixed bug that threw an error with a one-byte key
+
+### Removed
+
+- Dependencies ProfileView, Revise, and Debugger
+- Exported functions that shouldn't have been
 
 ## 1.0.0 - 2024-05-31
 
