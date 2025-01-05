@@ -18,6 +18,11 @@ export setBreakEven # in benchmark and here
 # carmichael is exported in case someone wants the Carmichael function,
 # which I couldn't find.
 # findMaxOrder is needed for test.
+export cycleRotBitcount,encryptSeq!,decryptSeq!,encryptPar!,decryptPar!
+# The above five functions will be removed from export in the future.
+# I'm not calling them deprecated, as that implies they will disappear,
+# which they won't, but it's similar. One is only for testing; the others
+# are internal.
 
 #--------------------------------------------------------------
 # Wring is a whole-message cipher.

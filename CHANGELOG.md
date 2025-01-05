@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to the [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
@@ -12,14 +12,17 @@ and this project adheres to the [Semantic Versioning](https://semver.org/).
 - Documentation of exported functions and structs
 - Method for setting parallel/serial thresholds to predetermined values
 
-### Changed
+### Fixed
 
-- Fixed bug that threw an error with a one-byte key
+- Bug that threw an error with a one-byte key
 
 ### Removed
 
 - Dependencies ProfileView, Revise, and Debugger
-- Exported functions that shouldn't have been
+
+### Deprecated
+
+- Exported functions that shouldn't have been. They will be unexported, not deleted.
 
 ## 1.0.0 - 2024-05-31
 
