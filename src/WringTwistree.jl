@@ -103,7 +103,12 @@ function keyedWring(key)
   Wring(sbox,invSbox,Яхид())
 end
 
-const linearWring=Wring(linearSbox(),linearInvSbox(),Яхид()) # for cryptanalysis
+# These two Wrings are for cryptanalysis. linearWring is for testing what
+# happens when the S-boxes are all different, but linear. tripleTwistWring
+# is a simulation of a weak key, where the three S-boxes are all the same.
+# I don't know whether any weak keys actually exist.
+const linearWring=Wring(linearSbox(),linearInvSbox(),Яхид())
+const tripleTwistWring=Wring(tripleTwistSbox(),tripleTwistInvSbox(),Яхид())
 
 function roundEncryptSeq(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
 		      rprime::Integer,rond::Integer)
