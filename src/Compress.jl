@@ -39,9 +39,10 @@ function roundCompress!(sbox::OffsetArray{UInt8},buf::Vector{UInt8},sboxalt::Int
   for i in eachindex(buf)
     @inbounds buf[i]=sbox[buf[i],(sboxalt+i-1)%3]
   end
-  rotBitcountSeq!(buf,tmp,twistPrime)
+  bc=rotBitcountSeq!(buf,tmp,twistPrime)
   backCrc!(tmp,buf)
   resize!(buf,length(buf)-4)
+  bc # For cryptanalysis. The return value is ignored when hashing.
 end
 
 function compress!(sbox::OffsetArray{UInt8},buf::Vector{UInt8},sboxalt::Integer)
