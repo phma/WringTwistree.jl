@@ -83,7 +83,7 @@ function findMaxOrder(n::Integer)
 end
 
 const relPrimes=OffsetArray(map(findMaxOrder∘(x -> x÷0x3),
-			    collect(0x0020:0x0060)),0x20:0x60)
+			    collect(0x0003:0x0101)),0x003:0x101)
 
 function mix3Worker!(buf::Vector{<:Integer},a,b,c,aInc,cInc,len)
   while len>0 && a<b

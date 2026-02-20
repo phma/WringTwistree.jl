@@ -163,6 +163,16 @@ function roundDecryptPar(wring::Wring,src::Vector{UInt8},dst::Vector{UInt8},
   mix3PartsPar!(dst,rprime)
 end
 
+function rPrime(n::Integer)
+  if n<3
+    one(n)
+  elseif checkbounds(Bool,relPrimes,n)
+    convert(typeof(n),relPrimes[n])
+  else
+    findMaxOrder(n÷3)
+  end
+end
+
 """
     encryptSeq!(wring::Wring,buf::Vector{UInt8})
 
@@ -172,7 +182,7 @@ function encryptSeq!(wring::Wring,buf::Vector{UInt8})
 # Puts ciphertext back into buf.
   tmp=copy(buf)
   nrond=nRounds(length(buf))
-  rprime=length(buf)<3 ? 1 : findMaxOrder(length(buf)÷3)
+  rprime=rPrime(length(buf))
   for i in 0:nrond-1
     if (i&1)==0
       roundEncryptSeq(wring,buf,tmp,rprime,i)
@@ -191,7 +201,7 @@ function encryptSeqN!(wring::Wring,nrond::Integer,buf::Vector{UInt8})
 # Puts ciphertext back into buf. Returns list of bitcounts.
   tmp=copy(buf)
   rots=Int[]
-  rprime=length(buf)<3 ? 1 : findMaxOrder(length(buf)÷3)
+  rprime=rPrime(length(buf))
   for i in 0:nrond-1
     if (i&1)==0
       push!(rots,roundEncryptSeq(wring,buf,tmp,rprime,i))
@@ -214,7 +224,7 @@ function encryptSeqN2!(wring::Wring,nrond::Integer,
   tmp0=copy(buf0)
   tmp1=copy(buf1)
   diffs=Int[]
-  rprime=length(buf0)<3 ? 1 : findMaxOrder(length(buf0)÷3)
+  rprime=rPrime(length(buf))
   for i in 0:nrond-1
     if (i&1)==0
       roundEncryptSeq(wring,buf0,tmp0,rprime,i)
@@ -246,7 +256,7 @@ function decryptSeq!(wring::Wring,buf::Vector{UInt8})
 # Puts plaintext back into buf.
   tmp=copy(buf)
   nrond=nRounds(length(buf))
-  rprime=length(buf)<3 ? 1 : findMaxOrder(length(buf)÷3)
+  rprime=rPrime(length(buf))
   for i in reverse(0:nrond-1)
     if ((nrond-i)&1)==1
       roundDecryptSeq(wring,buf,tmp,rprime,i)
@@ -270,7 +280,7 @@ function encryptPar!(wring::Wring,buf::Vector{UInt8})
 # Puts ciphertext back into buf.
   tmp=copy(buf)
   nrond=nRounds(length(buf))
-  rprime=length(buf)<3 ? 1 : findMaxOrder(length(buf)÷3)
+  rprime=rPrime(length(buf))
   for i in 0:nrond-1
     if (i&1)==0
       roundEncryptPar(wring,buf,tmp,rprime,i)
@@ -289,7 +299,7 @@ function encryptParN!(wring::Wring,nrond::Integer,buf::Vector{UInt8})
 # Puts ciphertext back into buf. Returns list of bitcounts.
   tmp=copy(buf)
   rots=Int[]
-  rprime=length(buf)<3 ? 1 : findMaxOrder(length(buf)÷3)
+  rprime=rPrime(length(buf))
   for i in 0:nrond-1
     if (i&1)==0
       push!(rots,roundEncryptPar(wring,buf,tmp,rprime,i))
@@ -312,7 +322,7 @@ function encryptParN2!(wring::Wring,nrond::Integer,
   tmp0=copy(buf0)
   tmp1=copy(buf1)
   diffs=Int[]
-  rprime=length(buf0)<3 ? 1 : findMaxOrder(length(buf0)÷3)
+  rprime=rPrime(length(buf))
   for i in 0:nrond-1
     if (i&1)==0
       roundEncryptPar(wring,buf0,tmp0,rprime,i)
@@ -342,7 +352,7 @@ function decryptPar!(wring::Wring,buf::Vector{UInt8})
 # Puts plaintext back into buf.
   tmp=copy(buf)
   nrond=nRounds(length(buf))
-  rprime=length(buf)<3 ? 1 : findMaxOrder(length(buf)÷3)
+  rprime=rPrime(length(buf))
   for i in reverse(0:nrond-1)
     if ((nrond-i)&1)==1
       roundDecryptPar(wring,buf,tmp,rprime,i)
