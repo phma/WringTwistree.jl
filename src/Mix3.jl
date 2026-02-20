@@ -1,6 +1,6 @@
 module Mix3
-using Primes,Mods,Base.Threads
-export carmichael,findMaxOrder,mix3PartsSeq!,mix3PartsPar!
+using Primes,Mods,Base.Threads,OffsetArrays
+export carmichael,findMaxOrder,relPrimes,mix3PartsSeq!,mix3PartsPar!
 
 # This should be a prime greater than all prime factors of numbers of threads
 # on CPUs. For instance, since there are 22-core 88-thread Power9 chips, it
@@ -81,6 +81,9 @@ function findMaxOrder(n::Integer)
   end
   one(n)
 end
+
+const relPrimes=OffsetArray(map(findMaxOrder∘(x -> x÷0x3),
+			    collect(0x0020:0x0060)),0x20:0x60)
 
 function mix3Worker!(buf::Vector{<:Integer},a,b,c,aInc,cInc,len)
   while len>0 && a<b

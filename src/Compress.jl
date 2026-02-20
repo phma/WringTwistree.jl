@@ -4,13 +4,10 @@ include("RotBitcount.jl")
 include("Sboxes.jl")
 using OffsetArrays
 using .Mix3,.RotBitcount,.Sboxes
-export relPrimes,lfsr,backCrc!,compress!,blockSize,twistPrime
+export lfsr,backCrc!,compress!,blockSize,twistPrime
 
 const blockSize=32
 const twistPrime=37
-
-const relPrimes=OffsetArray(map(findMaxOrder∘(x -> x÷0x3),
-			    collect(0x0020:0x0060)),0x20:0x60)
 
 function lfsr1(n::Integer)
   ((n&1)*0x84802140)⊻(n>>1)
